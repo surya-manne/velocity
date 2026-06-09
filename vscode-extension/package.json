@@ -1,0 +1,81 @@
+{
+  "name": "velocity-ai",
+  "displayName": "Velocity - AI Acceleration Layer",
+  "description": "An AI acceleration layer for Coding Assistants. Project intelligence, context layer, agent roles, workflow skills, runtime guardrails, and an SDLC pipeline — version-controlled in your repo.",
+  "version": "1.0.1",
+  "publisher": "SuryaManne",
+  "license": "MIT",
+  "icon": "assets/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SuryaManne/velocity"
+  },
+  "homepage": "https://github.com/SuryaManne/velocity#readme",
+  "bugs": {
+    "url": "https://github.com/SuryaManne/velocity/issues"
+  },
+  "keywords": [
+    "ai",
+    "coding assistants",
+    "productivity",
+    "agents",
+    "guardrails",
+    "velocity"
+  ],
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "velocity.init",
+        "title": "Velocity: Initialize workspace",
+        "category": "Velocity"
+      },
+      {
+        "command": "velocity.installPlugin",
+        "title": "Velocity: Install plugin entry files",
+        "category": "Velocity"
+      },
+      {
+        "command": "velocity.generateBundle",
+        "title": "Velocity: Generate local install bundle",
+        "category": "Velocity"
+      },
+      {
+        "command": "velocity.openDocs",
+        "title": "Velocity: Open documentation",
+        "category": "Velocity"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        { "command": "velocity.init" },
+        { "command": "velocity.installPlugin" },
+        { "command": "velocity.generateBundle" },
+        { "command": "velocity.openDocs" }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "vscode:prepublish": "npm run build",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.90.0",
+    "esbuild": "^0.21.0",
+    "typescript": "^5.4.0",
+    "@vscode/vsce": "^3.0.0"
+  }
+}

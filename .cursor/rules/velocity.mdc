@@ -1,0 +1,59 @@
+---
+description: Velocity — Velocity Platform engineering context
+alwaysApply: true
+---
+
+# Velocity Platform
+
+Acceleration layer for AI coding assistants. Provides skills, agents, guardrails, adapters, and organizational knowledge — purely prompt-driven, no CLI or server.
+
+## Domain language
+
+Before feature work: read .velocity/artifacts/context/CONTEXT.md
+All names (variables, files, API terms) must match CONTEXT.md glossary.
+
+## Standards
+
+- Engineering: .velocity/project-context/engineering.md
+- Testing: .velocity/project-context/testing.md
+- Security: .velocity/project-context/security.md
+
+## ADRs
+
+Before designing: read .velocity/knowledge-base/adrs/index.md
+
+## Skills
+
+/grill-with-docs — before feature work; reads CONTEXT.md
+/domain-model — align plan to CONTEXT.md before PRD
+/to-prd — after grill session
+/to-features — PRD → vertical slice board
+/to-tasks — features → tasks with blocking relationships
+/tdd — per task, fresh window
+/improve-codebase-architecture — periodic deepening
+/handoff — end of each slice
+/sync — regenerate assets after stack changes
+
+## Agents
+
+Engineer — implement skills, agents, templates; create PRs
+Architect — design skill chains, adapter architecture, ADRs
+Researcher — explore CONTEXT.md, knowledge base, prior slices
+Reviewer — review PRs, ADRs, skill quality
+
+## Guardrails
+
+Vertical slices only. No horizontal layer PRs.
+No secrets in skill files. Schema version bumps need approval.
+Tracer bullet required before expanding any new capability.
+
+## Stack
+
+Markdown + YAML frontmatter, JSON Schema, prompt-driven architecture.
+Skills: skills/\*_/SKILL.md — Agents: agents/_.md — Templates: templates/
+Schemas: schemas/\*.json — Dogfooding: .velocity/
+
+## Session start
+
+Check .velocity/project-intelligence/stack.md detected_at.
+If over 7 days old: run /sync before any feature work.

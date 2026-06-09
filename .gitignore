@@ -1,0 +1,44 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+vscode-extension/dist/
+vscode-extension/out/
+docs/node_modules/
+
+# VS Code extension packages
+vscode-extension/*.vsix
+
+# Velocity runtime / temp
+agents/TEMP/
+.velocity/artifacts/ralph/
+.velocity/artifacts/context/
+.velocity/artifacts/handoffs/
+.velocity/artifacts/approvals/
+.velocity/artifacts/audit/
+.velocity/install/
+
+# Plans (feature execution artifacts)
+plans/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+plan-v2.md
+plan.md
+plan-ai-sdlc-addendum.md
