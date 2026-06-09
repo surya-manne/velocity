@@ -14,7 +14,7 @@
         <div class="vh-cta-row">
           <a href="/guide/overview" class="vh-btn vh-btn--primary">Quick Start →</a>
           <a href="/skills/" class="vh-btn vh-btn--ghost">Browse Skills</a>
-          <a href="https://github.com/SuryaManne/velocity" class="vh-btn vh-btn--ghost" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+          <a href="https://github.com/surya-manne/velocity" class="vh-btn vh-btn--ghost" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
       </div>
       <button class="vh-scroll-hint" aria-label="Scroll down" @click="scrollToFeatures">
@@ -192,8 +192,8 @@
         <p class="vh-footer-bottom-links">
           <a href="/guide/overview">Docs</a>
           <a href="/guide/installation">Quick Start</a>
-          <a href="https://github.com/SuryaManne/velocity" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://github.com/SuryaManne/velocity/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+          <a href="https://github.com/surya-manne/velocity" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/surya-manne/velocity/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         </p>
       </div>
     </footer>

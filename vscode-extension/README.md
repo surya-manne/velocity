@@ -281,12 +281,12 @@ No. If a file has been customized (more than 20% of lines changed from the bundl
 Run `#velocity-sync` or `/velocity-sync` in AI Chat. The VS Code extension updates automatically.
 
 **Do I need the VS Code extension?**
-It handles file placement automatically. Without it, you'd need to copy the skill files from the [GitHub repository](https://github.com/SuryaManne/velocity) manually.
+It handles file placement automatically. Without it, you'd need to copy the skill files from the [GitHub repository](https://github.com/surya-manne/velocity) manually.
 
 ---
 
 ## Resources
 
-- [GitHub Repository](https://github.com/SuryaManne/velocity)
-- [Issues and Feature Requests](https://github.com/SuryaManne/velocity/issues)
-- [Changelog](https://github.com/SuryaManne/velocity/releases)
+- [GitHub Repository](https://github.com/surya-manne/velocity)
+- [Issues and Feature Requests](https://github.com/surya-manne/velocity/issues)
+- [Changelog](https://github.com/surya-manne/velocity/releases)

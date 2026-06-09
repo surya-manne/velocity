@@ -682,7 +682,7 @@ Domain packs apply a **risk score modifier** (`+15` for FinTech, `+20` for Healt
 
 ---
 
-## RALPH Loop (Internal)
+## RALPH Loop
 
 Velocity builds itself using the RALPH loop:
 
@@ -702,25 +702,3 @@ Velocity builds itself using the RALPH loop:
 RALPH is strictly internal. It does not ship to consumer repositories. `/init` and `/sync` never copy `.velocity/artifacts/ralph/` to consumer repos.
 
 ---
-
-## Implementation Status
-
-| Slice | Description                                  | Status      |
-| ----- | -------------------------------------------- | ----------- |
-| 1a    | Repository Structure + Project Intelligence  | ✅ Complete |
-| 1b    | Agent Factory + Skill Factory                | ✅ Complete |
-| 1c    | Cursor Adapter + Continuous Regeneration     | ✅ Complete |
-| 2     | Grill With Docs + CONTEXT.md Engine          | ✅ Complete |
-| 3     | Product Discovery to Kanban                  | ✅ Complete |
-| 4     | TDD + Deep Modules                           | ✅ Complete |
-| 5     | Architecture and Design Intelligence         | ✅ Complete |
-| 6     | Workspace Intelligence (Multi-Repo)          | ✅ Complete |
-| 7     | Guardrails, Hooks, and Automated Enforcement | ✅ Complete |
-| 8     | Organizational Memory and Handoff            | ✅ Complete |
-| 9     | External Standards and Rule Packs            | ✅ Complete |
-| 10    | Claude Code Adapter                          | ✅ Complete |
-| 11    | GitHub Copilot and Gemini Adapters           | ✅ Complete |
-| 12    | Autonomous Agent Loop                        | ✅ Complete |
-| 13    | Enterprise Governance                        | ✅ Complete |
-| 14    | Marketplace                                  | ✅ Complete |
-| 15    | RALPH Loop (Internal)                        | ✅ Complete |

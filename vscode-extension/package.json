@@ -8,11 +8,11 @@
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SuryaManne/velocity"
+    "url": "https://github.com/surya-manne/velocity"
   },
-  "homepage": "https://github.com/SuryaManne/velocity#readme",
+  "homepage": "https://github.com/surya-manne/velocity#readme",
   "bugs": {
-    "url": "https://github.com/SuryaManne/velocity/issues"
+    "url": "https://github.com/surya-manne/velocity/issues"
   },
   "keywords": [
     "ai",

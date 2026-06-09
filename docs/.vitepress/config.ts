@@ -2,6 +2,7 @@ import { defineConfig } from "vitepress";
 import { withMermaid } from "vitepress-plugin-mermaid";
 
 export default withMermaid(defineConfig({
+  base: "/velocity/",
   title: "Velocity",
   description:
     "The Acceleration Layer for AI Coding Assistants — project intelligence, guardrails, and skills for Cursor, Claude Code, Copilot, and Gemini.",
@@ -182,7 +183,7 @@ export default withMermaid(defineConfig({
     },
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/SuryaManne/velocity" },
+      { icon: "github", link: "https://github.com/surya-manne/velocity" },
     ],
 
     search: {
