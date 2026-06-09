@@ -6,14 +6,14 @@
       <div class="vh-hero-glow" aria-hidden="true" />
       <div class="vh-container" style="display:flex;flex-direction:column;align-items:center;text-align:center;">
         <div class="vh-logo-wrap">
-          <img src="/logo.png" alt="Velocity logo" class="vh-logo" />
+          <img :src="withBase('/logo.png')" alt="Velocity logo" class="vh-logo" />
         </div>
         <h1 class="vh-title">VELOCITY</h1>
         <p class="vh-subtitle">An AI acceleration layer for Coding Assistants.</p>
         <p class="vh-desc">An engineering harness for AI coding assistants - unifying project intelligence, agent roles, an AI-native SDLC, deterministic guardrails, and a self-improving RALPH loop into one shared foundation.</p>
         <div class="vh-cta-row">
-          <a href="/guide/overview" class="vh-btn vh-btn--primary">Quick Start →</a>
-          <a href="/skills/" class="vh-btn vh-btn--ghost">Browse Skills</a>
+          <a :href="withBase('/guide/overview')" class="vh-btn vh-btn--primary">Quick Start →</a>
+          <a :href="withBase('/skills/')" class="vh-btn vh-btn--ghost">Browse Skills</a>
           <a href="https://github.com/surya-manne/velocity" class="vh-btn vh-btn--ghost" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </div>
       </div>
@@ -92,7 +92,7 @@
         <div class="vh-loop-badge">⟳ AUTONOMOUS</div>
         <h2 class="vh-loop-title">Run the entire chain with <code>/loop</code></h2>
         <p class="vh-loop-desc">One command executes every step of the skill chain autonomously — task by task, in isolated context windows, with automatic human-in-the-loop pauses for high-risk decisions. The loop state is saved to disk so it can resume after any interruption.</p>
-        <a href="/guide/loop" class="vh-btn vh-btn--primary">Learn about /loop →</a>
+        <a :href="withBase('/guide/loop')" class="vh-btn vh-btn--primary">Learn about /loop →</a>
       </div>
     </section>
 
@@ -190,8 +190,8 @@
           <span class="vh-status-dot"></span> Active Development
         </p>
         <p class="vh-footer-bottom-links">
-          <a href="/guide/overview">Docs</a>
-          <a href="/guide/installation">Quick Start</a>
+          <a :href="withBase('/guide/overview')">Docs</a>
+          <a :href="withBase('/guide/installation')">Quick Start</a>
           <a href="https://github.com/surya-manne/velocity" target="_blank" rel="noopener">GitHub</a>
           <a href="https://github.com/surya-manne/velocity/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         </p>
@@ -202,6 +202,7 @@
 </template>
 
 <script setup>
+import { withBase } from 'vitepress';
 function scrollToFeatures() {
   const el = document.querySelector('.vh-features');
   if (!el) return;

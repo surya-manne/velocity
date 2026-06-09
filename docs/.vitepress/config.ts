@@ -21,7 +21,7 @@ export default withMermaid(defineConfig({
         rel: "stylesheet",
       },
     ],
-    ["link", { rel: "icon", type: "image/png", href: "/logo.png" }],
+    ["link", { rel: "icon", type: "image/png", href: "/velocity/logo.png" }],
     ["meta", { name: "theme-color", content: "#ffc002" }],
     ["meta", { property: "og:type", content: "website" }],
     [
@@ -191,7 +191,7 @@ export default withMermaid(defineConfig({
     },
 
     editLink: {
-      pattern: "https://github.com/your-org/velocity/edit/main/docs/:path",
+      pattern: "https://github.com/surya-manne/velocity/edit/main/docs/:path",
       text: "Edit this page",
     },
   },

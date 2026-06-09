@@ -164,27 +164,27 @@
       <div class="vo-related">
         <h2 class="vo-section-title">Dig Deeper</h2>
         <div class="vo-related-grid">
-          <a href="/guide/smart-router" class="vo-related-link">
+          <a :href="withBase('/guide/smart-router')" class="vo-related-link">
             <div class="vo-related-label">Smart Router →</div>
             <div class="vo-related-desc">How requests are classified and routed to the right workflow</div>
           </a>
-          <a href="/guide/project-intelligence" class="vo-related-link">
+          <a :href="withBase('/guide/project-intelligence')" class="vo-related-link">
             <div class="vo-related-label">Project Intelligence →</div>
             <div class="vo-related-desc">Stack fingerprinting, CONTEXT.md, and progressive context loading</div>
           </a>
-          <a href="/guide/skill-chain" class="vo-related-link">
+          <a :href="withBase('/guide/skill-chain')" class="vo-related-link">
             <div class="vo-related-label">Canonical Skill Chain →</div>
             <div class="vo-related-desc">The full end-to-end workflow from idea to PR</div>
           </a>
-          <a href="/guide/loop" class="vo-related-link">
+          <a :href="withBase('/guide/loop')" class="vo-related-link">
             <div class="vo-related-label">Autonomous Loop →</div>
             <div class="vo-related-desc">Run the entire chain autonomously with /loop</div>
           </a>
-          <a href="/guide/consumer-ralph" class="vo-related-link">
+          <a :href="withBase('/guide/consumer-ralph')" class="vo-related-link">
             <div class="vo-related-label">RALPH Loop →</div>
             <div class="vo-related-desc">How the feedback cycle improves your local skills</div>
           </a>
-          <a href="/guide/installation" class="vo-related-link vo-related-link--cta">
+          <a :href="withBase('/guide/installation')" class="vo-related-link vo-related-link--cta">
             <div class="vo-related-label">Get Started →</div>
             <div class="vo-related-desc">Install Velocity in your repository in minutes</div>
           </a>
@@ -194,6 +194,10 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { withBase } from 'vitepress';
+</script>
 
 <style scoped>
 .vo-page {
