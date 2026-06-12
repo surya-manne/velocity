@@ -2,6 +2,8 @@
 
 Adapters let one Velocity setup work across multiple assistants. You keep one source of truth in `.velocity/`, and adapters generate the files each assistant expects.
 
+> Looking to install Velocity as a native plugin (Claude Code, Cursor, or VS Code Copilot)? See [Installable Plugins](/adapters/plugins). Adapters run inside a repo; plugins are the distributable install units that carry the skills, agents, and the `init` command.
+
 ## Why This Matters
 
 Real teams do not always use one assistant.
@@ -32,29 +34,29 @@ The point is consistency. Different developers can use different assistants with
 
 ## Supported Assistants
 
-| Assistant | Adapter | Always-on format |
-| --- | --- | --- |
-| [Cursor](/adapters/cursor) | `cursor-adapter` | `.cursor/rules/velocity.mdc` |
-| [Claude Code](/adapters/claude-code) | `claude-code-adapter` | `CLAUDE.md` |
-| [GitHub Copilot](/adapters/copilot) | `copilot-adapter` | `.github/copilot-instructions.md` |
-| [Gemini](/adapters/gemini) | `gemini-adapter` | `GEMINI.md` |
+| Assistant                            | Adapter               | Always-on format                  |
+| ------------------------------------ | --------------------- | --------------------------------- |
+| [Cursor](/adapters/cursor)           | `cursor-adapter`      | `.cursor/rules/velocity.mdc`      |
+| [Claude Code](/adapters/claude-code) | `claude-code-adapter` | `CLAUDE.md`                       |
+| [GitHub Copilot](/adapters/copilot)  | `copilot-adapter`     | `.github/copilot-instructions.md` |
+| [Gemini](/adapters/gemini)           | `gemini-adapter`      | `GEMINI.md`                       |
 
 ## What Changes Between Assistants
 
-| Capability | Cursor | Claude Code | Copilot | Gemini |
-| --- | --- | --- | --- | --- |
-| Entry file | `.cursor/rules/*.mdc` | `CLAUDE.md` | `.github/copilot-instructions.md` | `GEMINI.md` |
-| Agent files | separate agent files | subagents | combined agent file | separate agent files |
-| Skill invocation | slash commands | slash commands | prompt files or chat prompts | tool-style commands |
-| Hooks | native hooks | shell hooks | usually lighter/manual | depends on host support |
+| Capability       | Cursor                | Claude Code    | Copilot                           | Gemini                  |
+| ---------------- | --------------------- | -------------- | --------------------------------- | ----------------------- |
+| Entry file       | `.cursor/rules/*.mdc` | `CLAUDE.md`    | `.github/copilot-instructions.md` | `GEMINI.md`             |
+| Agent files      | separate agent files  | subagents      | combined agent file               | separate agent files    |
+| Skill invocation | slash commands        | slash commands | prompt files or chat prompts      | tool-style commands     |
+| Hooks            | native hooks          | shell hooks    | usually lighter/manual            | depends on host support |
 
 ## Real-World Examples
 
-| Team setup | Why adapters help |
-| --- | --- |
-| Platform team uses Cursor, app team uses Copilot | Both teams still read the same context and guardrails |
-| One repo has mixed IDE preferences | The repo stays aligned without maintaining two doc systems |
-| A team migrates from one assistant to another | Velocity keeps the project layer stable during the move |
+| Team setup                                       | Why adapters help                                          |
+| ------------------------------------------------ | ---------------------------------------------------------- |
+| Platform team uses Cursor, app team uses Copilot | Both teams still read the same context and guardrails      |
+| One repo has mixed IDE preferences               | The repo stays aligned without maintaining two doc systems |
+| A team migrates from one assistant to another    | Velocity keeps the project layer stable during the move    |
 
 ## Running One Adapter
 

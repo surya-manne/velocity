@@ -2,88 +2,117 @@
 
 Get Velocity running in your repository in under 5 minutes.
 
-## TL;DR
+## Step 1 — Install
 
-**Option A — VS Code Extension (fastest)**
-1. Install **Velocity AI** (`SuryaManne.velocity-ai`) from the VS Code Marketplace
-2. Run **Velocity: Initialize workspace** from the Command Palette
-3. In AI Chat, run `/velocity-init` (Cursor / Claude Code) or `#velocity-init` (Copilot)
+### Option 1: Plugin (Recommended)
 
-**Option B — Manual copy**
+**VS Code Copilot & Cursor** — Open the **Agent Customizations** panel in the Chat sidebar, go to **Plugins → Install Plugin from Source**, and enter:
+
+```
+https://github.com/surya-manne/velocity
+```
+
+**Claude Code:**
+
+```text
+/plugin marketplace add https://github.com/surya-manne/velocity
+/plugin install velocity
+```
+
+### Option 2: VS Code Extension
+
+1. Open Extensions (`⌘⇧X` / `Ctrl⇧X`), search **Velocity AI** (`SuryaManne.velocity-ai`), click **Install**
+2. Open Command Palette (`⌘⇧P` / `Ctrl⇧P`) and run **Velocity: Initialize workspace**
+
+### Option 3: Offline
+
+Copy the init skill file into the location your assistant reads prompts from:
+
+<details>
+<summary><strong>VS Code Copilot</strong></summary>
+
 ```bash
-# Copy init skill for your assistant, e.g. for Cursor:
-mkdir -p .cursor/skills
+mkdir -p .github/prompts
+cp /path/to/velocity/skills/init/SKILL.md .github/prompts/velocity-init.prompt.md
+```
+
+</details>
+
+<details>
+<summary><strong>Cursor</strong></summary>
+
+```bash
 cp /path/to/velocity/skills/init/SKILL.md .cursor/skills/velocity-init.md
+```
 
-# Run in your assistant
-# /velocity-init
+</details>
 
-# Commit the generated files
-git add .velocity/ .cursor/ CLAUDE.md && git commit -m "chore: initialize velocity"
+<details>
+<summary><strong>Claude Code</strong></summary>
+
+```bash
+mkdir -p commands
+cp /path/to/velocity/skills/init/SKILL.md commands/velocity-init.md
+```
+
+</details>
+
+## Step 2 — Run /init
+
+Open a new AI chat and run the init command:
+
+| Assistant       | Command           |
+| --------------- | ----------------- |
+| VS Code Copilot | `#velocity-init`  |
+| Cursor          | `/velocity-init`  |
+| Claude Code     | `/velocity-init`  |
+
+::: info What /init does
+Detects your stack, creates `.velocity/`, scaffolds `CONTEXT.md`, generates adapters for your assistant, and wires guardrail hooks. Resumable if interrupted.
+:::
+
+## Step 3 — Commit
+
+```bash
+git add .velocity/ .cursor/ AGENTS.md .github/ CLAUDE.md commands/ subagents/ hooks/
+git commit -m "chore: initialize velocity workspace"
 ```
 
 ---
 
 ## Your First Session
 
-Once `/init` is complete, here's the recommended first session with Velocity:
+### New codebase?
 
-### Greenfield Project (New Codebase)
+After `/init`, run `/grill-me`. It asks you one focused question at a time to establish domain language — bounded contexts, architecture decisions, scale, security constraints, and your first vertical slice.
 
-```
-You (in chat): /velocity-init
-```
+### Existing codebase?
 
-Wait for init to complete, then:
-
-```
-You: /grill-me
-```
-
-`/grill-me` asks you one sharp question at a time to establish domain language. It covers product fundamentals, bounded contexts, architecture decisions, scale requirements, security constraints, and your first vertical slice.
-
-After the session, CONTEXT.md is populated with your domain's ubiquitous language.
-
-### Brownfield Project (Existing Codebase)
-
-```
-You (in chat): /velocity-init
-```
-
-Wait for init to complete, then:
-
-```
-You: /grill-with-docs
-```
-
-`/grill-with-docs` reads your existing code and documentation first, then interviews you to fill gaps. It never invents terms — it discovers the language already used in your codebase.
+After `/init`, run `/grill-with-docs`. It reads your code and documentation first, then fills the gaps. It never invents terms — it discovers the language already in your codebase.
 
 ---
 
 ## The Canonical Workflow
 
-After your first session, the standard workflow for any new feature is:
+For any new feature after your first session:
 
-```
-1. /domain-model    — Align the feature to CONTEXT.md
-2. /to-prd          — Write the product requirement document
-3. /to-features     — Break the PRD into vertical slices
-4. /to-tasks        — Break features into tasks with blocking relationships
-5. /tdd             — Implement each task: red → green → refactor
-6. /validate        — Run 12-point guardrail check before PR
-```
+1. `/to-prd` — Write the product requirement document
+2. `/to-features` — Break the PRD into vertical slices
+3. `/to-tasks` — Break features into tasks with blocking relationships
+4. `/tdd` — Implement each task: red → green → refactor
+5. `/validate` — Run the 12-point guardrail check before PR
 
-Or run the full chain autonomously:
+Or run the entire chain autonomously:
 
 ```
 /loop
 ```
 
-The `/loop` skill executes the task board end-to-end, pausing at high-risk actions and after each task for a handoff artifact.
+`/loop` executes every step end-to-end, pausing only at high-risk decisions and after each task for a handoff artifact.
 
 ---
 
-## Common First Commands
+## Common Commands
 
 | Goal                       | Command             |
 | -------------------------- | ------------------- |
@@ -94,6 +123,7 @@ The `/loop` skill executes the task board end-to-end, pausing at high-risk actio
 | Update after stack change  | `/sync`             |
 | Run full autonomous loop   | `/loop`             |
 | Score change risk          | `/risk-score`       |
+
 | Create architecture doc    | `/architecture-doc` |
 
 ---

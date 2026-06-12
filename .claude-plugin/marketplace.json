@@ -1,0 +1,15 @@
+{
+  "name": "velocity",
+  "owner": {
+    "name": "Surya Manne",
+    "url": "https://github.com/surya-manne/velocity"
+  },
+  "plugins": [
+    {
+      "name": "velocity",
+      "source": "./plugins/dist/claude-code/velocity",
+      "description": "Velocity AI acceleration layer — project intelligence, domain context, agent roles, the SDLC skill chain, and runtime guardrails. Run /velocity-init to set up project context and intelligence in any repository.",
+      "version": "1.0.0"
+    }
+  ]
+}

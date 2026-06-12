@@ -1,0 +1,25 @@
+{
+  "name": "velocity-plugin-builder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Publish-time generator that emits Velocity native plugins for Claude Code, Cursor, and Copilot from the canonical sources.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "velocity-plugin-builder": "src/index.ts"
+  },
+  "scripts": {
+    "build:plugins": "tsx src/index.ts build",
+    "check": "tsx src/index.ts check",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.4.0"
+  }
+}
