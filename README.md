@@ -43,7 +43,7 @@ Copy the plugin folder for your assistant into your repo:
 
 ## Get Started
 
-After installing, run `/velocity-init` (or `#velocity-init` in Copilot) in your AI assistant's chat. This sets up `.velocity/` with project intelligence, agents, skills, and adapter files for your assistant.
+After installing, run `/velocity-init` (or `#velocity:init` in Copilot) in your AI assistant's chat. This sets up `.velocity/` with project intelligence, agents, skills, and adapter files for your assistant.
 
 ---
 

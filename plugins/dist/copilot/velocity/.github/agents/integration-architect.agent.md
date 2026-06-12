@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: integration-architect
 description: "Service integration patterns, messaging topology, and cross-service communication design. Activated for microservices and event-driven architectures. Reviews proposed integration designs for coupling, resilience, and observability. Advises on saga patterns, outbox patterns, and circuit breaker configurations."
 ---
 

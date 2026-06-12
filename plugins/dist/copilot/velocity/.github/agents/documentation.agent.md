@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: documentation
 description: "Generates and maintains docs: READMEs, API references, runbooks, architecture overviews, CONTEXT.md updates, and handoff documents. Keeps docs in sync with code changes. Runs after slice completion to update the knowledge base index and any affected documentation. Also invoked when onboarding documentation for an existing brownfield repository."
 ---
 

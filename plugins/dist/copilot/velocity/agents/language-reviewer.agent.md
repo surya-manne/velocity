@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: language-reviewer
 description: "CONTEXT.md term consistency check for any PR, ADR, or document. Scans code changes for variable names, class names, API endpoint names, and database column names that diverge from CONTEXT.md glossary terms. Flags drift with specific line references. Proposes CONTEXT.md updates when a legitimate new term has been introduced that the glossary should capture."
 ---
 

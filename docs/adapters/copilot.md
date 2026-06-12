@@ -3,7 +3,7 @@
 The GitHub Copilot adapter generates native Copilot assets for VS Code and JetBrains: the always-on instructions file, the agents manifest, and prompt files for each skill.
 
 ::: tip Install as a plugin
-Open the Agent Customizations panel in the Chat sidebar, go to Plugins → Install Plugin from Source, enter `https://github.com/surya-manne/velocity`, then run `#velocity-init`. See [Installable Plugins](/adapters/plugins). The adapter below describes the per-repo files `init`/`sync` generate inside an initialized project.
+Open the Agent Customizations panel in the Chat sidebar, go to Plugins → Install Plugin from Source, enter `https://github.com/surya-manne/velocity`, then run `#velocity:init`. See [Installable Plugins](/adapters/plugins). The adapter below describes the per-repo files `init`/`sync` generate inside an initialized project.
 :::
 
 ## Generated Files
@@ -53,13 +53,13 @@ Full rules: .velocity/guardrails/default.md
 
 ## Prompts
 
-Use #velocity-{skill-name} to invoke skills.
-Example: #velocity-tdd, #velocity-validate, #velocity-loop
+Use #velocity:{skill-name} to invoke skills.
+Example: #velocity:tdd, #velocity:validate, #velocity:loop
 
 ## Rules
 
 - Never invent domain terms — always use CONTEXT.md vocabulary
-- Run #velocity-validate before every pull request
+- Run #velocity:validate before every pull request
 - Use fresh context window per task (open new session for each /tdd)
 ```
 
@@ -74,7 +74,7 @@ The agents manifest defines all agent roles in a single file (Copilot's format):
 
 Senior Software Engineer with expertise in TypeScript, Next.js 14, Fastify, PostgreSQL.
 **Use for:** Implementation, TDD, code review, bug fixes.
-**Prompts:** #velocity-tdd, #velocity-validate, #velocity-loop, #velocity-handoff
+**Prompts:** #velocity:tdd, #velocity:validate, #velocity:loop, #velocity:handoff
 **Context:** Always read .velocity/project-context/engineering.md
 
 ---
@@ -83,7 +83,7 @@ Senior Software Engineer with expertise in TypeScript, Next.js 14, Fastify, Post
 
 System architect with deep understanding of DDD and this project's bounded context model.
 **Use for:** Design decisions, API design, ADR creation, architecture review.
-**Prompts:** #velocity-architecture-doc, #velocity-api-design, #velocity-adr-engine
+**Prompts:** #velocity:architecture-doc, #velocity:api-design, #velocity:adr-engine
 **Context:** Always read context-map.md and relevant ADRs
 
 ---
@@ -92,7 +92,7 @@ System architect with deep understanding of DDD and this project's bounded conte
 
 Product manager skilled at domain-driven requirements.
 **Use for:** PRDs, feature planning, discovery sessions.
-**Prompts:** #velocity-grill-me, #velocity-grill-with-docs, #velocity-to-prd, #velocity-to-features
+**Prompts:** #velocity:grill-me, #velocity:grill-with-docs, #velocity:to-prd, #velocity:to-features
 
 ---
 
@@ -100,7 +100,7 @@ Product manager skilled at domain-driven requirements.
 
 Security engineer focused on threat modeling and compliance.
 **Use for:** Security review, auth/authz design, risk scoring.
-**Prompts:** #velocity-security-design, #velocity-risk-score, #velocity-audit-trail
+**Prompts:** #velocity:security-design, #velocity:risk-score, #velocity:audit-trail
 
 ---
 
@@ -158,13 +158,13 @@ Velocity assigns modes based on skill type:
 
 ```
 # In Copilot Chat
-#velocity-tdd TASK-003
+#velocity:tdd TASK-003
 
-#velocity-validate
+#velocity:validate
 
-#velocity-grill-me
+#velocity:grill-me
 
-#velocity-loop
+#velocity:loop
 ```
 
 ## Limitations vs Cursor/Claude Code

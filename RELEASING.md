@@ -93,7 +93,7 @@ cp -R plugins/dist/copilot/velocity/.github  /path/to/test-repo/.github
 cp    plugins/dist/copilot/velocity/AGENTS.md /path/to/test-repo/
 ```
 
-Run `#velocity-init` in Copilot Chat. Ensure `chat.promptFiles` and `chat.instructionsFilesLocations` are enabled in VS Code settings.
+Run `#velocity:init` in Copilot Chat. No VS Code settings changes required — the plugin exposes skills natively via `skills/` and always-on instructions via `rules/` at the plugin root.
 
 ---
 

@@ -1,15 +1,8 @@
 ---
 name: risk-score
-description: >-
-  Compute an automated risk score (0–100) for a PR or branch based on change
-  surface, compliance posture, domain signals, and guardrail state. Score maps
-  to a risk band (low / medium / high / critical) that drives approval workflow
-  thresholds and loop approval gate decisions. Invoked automatically by validate
-  and loop skills. Can also be run directly on any branch.
-metadata:
-  surfaces:
-    - agent
+description: "Compute an automated risk score (0–100) for a PR or branch based on change surface, compliance posture, domain signals, and guardrail state. Score maps to a risk band (low / medium / high / critical) that drives approval workflow thresholds and loop approval gate decisions. Invoked automatically by validate and loop skills. Can also be run directly on any branch."
 ---
+
 
 # Risk Score
 

@@ -1,14 +1,8 @@
 ---
 name: ralph-annotate
-description: >-
-  Capture structured feedback after a Velocity skill run. Records what worked,
-  what failed, and what was missing. Used internally to build the Velocity
-  platform. Not shipped to consumer repositories. Run immediately after
-  evaluating a skill's output on the Velocity codebase or a test scenario.
-metadata:
-  surfaces:
-    - agent
+description: "Capture structured feedback after a Velocity skill run. Records what worked, what failed, and what was missing. Used internally to build the Velocity platform. Not shipped to consumer repositories. Run immediately after evaluating a skill's output on the Velocity codebase or a test scenario."
 ---
+
 
 # RALPH Annotate
 

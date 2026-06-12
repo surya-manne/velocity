@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: engineer
 description: "The primary implementation agent. Picks up tasks from the feature board and implements them end-to-end. Runs the tdd skill. Writes code, tests, and commits. Creates PRs. Consults specialist agents when needed. Respects CONTEXT.md domain language in all generated code. Runs the autonomous /loop. Does not own a particular discipline — backend, frontend, and DevOps specificity is delivered entirely through its activated subagents."
 ---
 

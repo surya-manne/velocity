@@ -1,16 +1,8 @@
 ---
 name: skill-factory
-description: >-
-  Generate project-specific skill configurations for this repository.
-  Reads the stack fingerprint and configures the canonical skill chain
-  with stack-appropriate variants (test framework, API style, etc.).
-  Generates stack-specific skills (Kafka Review, GraphQL Governance, etc.).
-  Writes configured skill files to .velocity/skills/. Run automatically
-  by /init and /sync.
-metadata:
-  surfaces:
-    - agent
+description: "Generate project-specific skill configurations for this repository. Reads the stack fingerprint and configures the canonical skill chain with stack-appropriate variants (test framework, API style, etc.). Generates stack-specific skills (Kafka Review, GraphQL Governance, etc.). Writes configured skill files to .velocity/skills/. Run automatically by /init and /sync."
 ---
+
 
 # Skill Factory
 

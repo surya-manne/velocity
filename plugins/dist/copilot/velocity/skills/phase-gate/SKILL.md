@@ -1,15 +1,8 @@
 ---
 name: phase-gate
-description: >-
-  Phase exit evaluation. Runs automated checks (feedback-loop, guardrails) or
-  presents artifacts to the developer for human approval using the fixed gate
-  schema. Advances pipeline state on approval. Records revision requests on
-  rejection. Handles phase skips with justification. Invoke when a phase
-  completes or when a developer wants to skip a phase.
-metadata:
-  surfaces:
-    - agent
+description: "Phase exit evaluation. Runs automated checks (feedback-loop, guardrails) or presents artifacts to the developer for human approval using the fixed gate schema. Advances pipeline state on approval. Records revision requests on rejection. Handles phase skips with justification. Invoke when a phase completes or when a developer wants to skip a phase."
 ---
+
 
 # Phase Gate
 

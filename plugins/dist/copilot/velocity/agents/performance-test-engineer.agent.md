@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: performance-test-engineer
 description: "Load testing, latency profiling, and performance regression detection. Activated when the stack includes k6, Gatling, Playwright, or when the project has defined SLA requirements. Designs load test scenarios based on expected peak throughput and SLA targets from project context. Reviews performance baselines and proposes regression gates for CI/CD."
 ---
 

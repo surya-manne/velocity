@@ -1,15 +1,8 @@
 ---
 name: audit-trail
-description: >-
-  Write a structured audit log entry to .velocity/artifacts/audit/ for any agent
-  action, guardrail result, artifact change, approval decision, or loop event.
-  Invoked automatically by loop, validate, and approval-workflow skills. Can also
-  be called directly to record a manual decision. Produces tamper-evident,
-  append-only JSON-L entries with ISO timestamps and actor identification.
-metadata:
-  surfaces:
-    - agent
+description: "Write a structured audit log entry to .velocity/artifacts/audit/ for any agent action, guardrail result, artifact change, approval decision, or loop event. Invoked automatically by loop, validate, and approval-workflow skills. Can also be called directly to record a manual decision. Produces tamper-evident, append-only JSON-L entries with ISO timestamps and actor identification."
 ---
+
 
 # Audit Trail
 

@@ -1,15 +1,8 @@
 ---
 name: ralph-consumer-propose
-description: >-
-  RALPH Loop — Propose step. Reads a learn artifact and drafts targeted
-  improvements to this project's deployed skill instances in .velocity/skills/.
-  Each proposal includes a before/after diff and rationale. Proposals are
-  project-local — they never touch Velocity platform templates. Developer
-  reviews and approves each proposal before harden runs.
-metadata:
-  surfaces:
-    - agent
+description: "RALPH Loop — Propose step. Reads a learn artifact and drafts targeted improvements to this project's deployed skill instances in .velocity/skills/. Each proposal includes a before/after diff and rationale. Proposals are project-local — they never touch Velocity platform templates. Developer reviews and approves each proposal before harden runs."
 ---
+
 
 # RALPH Loop — Propose
 

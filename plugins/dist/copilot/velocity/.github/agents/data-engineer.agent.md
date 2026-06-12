@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: data-engineer
 description: "Schema design, database migrations, query optimization, and data access patterns. Activated when the stack includes a relational or document database. Designs schemas that reflect CONTEXT.md terminology exactly. Produces reversible migrations. Identifies N+1 problems and proposes indexing strategies. Works within the vertical slice — never creates schema changes in isolation without the API and UI layers they serve."
 ---
 

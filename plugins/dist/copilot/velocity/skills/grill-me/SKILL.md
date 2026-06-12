@@ -1,15 +1,8 @@
 ---
 name: grill-me
-description: >-
-  Relentless greenfield interview. No codebase required. Challenges every
-  assumption about a plan one question at a time. Walks the full design tree
-  until all decisions are resolved. Use for new ideas, early-stage products,
-  or when starting from scratch. Use grill-with-docs instead when a codebase
-  exists.
-metadata:
-  surfaces:
-    - agent
+description: "Relentless greenfield interview. No codebase required. Challenges every assumption about a plan one question at a time. Walks the full design tree until all decisions are resolved. Use for new ideas, early-stage products, or when starting from scratch. Use grill-with-docs instead when a codebase exists."
 ---
+
 
 # Grill Me
 

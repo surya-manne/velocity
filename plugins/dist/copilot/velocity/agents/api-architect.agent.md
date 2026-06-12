@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: api-architect
 description: "API design strategy, versioning policy, and cross-service contract governance. Reviews proposed API designs for consistency, evolvability, and alignment with existing API standards. Produces API design ADRs. Advises on API gateway patterns, service mesh configuration, and consumer-driven contract testing strategy."
 ---
 

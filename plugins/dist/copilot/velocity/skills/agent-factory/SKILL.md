@@ -1,16 +1,8 @@
 ---
 name: agent-factory
-description: >-
-  Generate configured agent instances for this repository. Reads the stack
-  fingerprint, wires stack-appropriate skills and subagents to each role agent,
-  injects CONTEXT.md and standards into system prompts, and writes configured
-  agent files to .velocity/agents/. Also generates the Agent Context Protocol
-  entry document. Run automatically by /init and /sync; invoke manually
-  to reconfigure agents after a stack change.
-metadata:
-  surfaces:
-    - agent
+description: "Generate configured agent instances for this repository. Reads the stack fingerprint, wires stack-appropriate skills and subagents to each role agent, injects CONTEXT.md and standards into system prompts, and writes configured agent files to .velocity/agents/. Also generates the Agent Context Protocol entry document. Run automatically by /init and /sync; invoke manually to reconfigure agents after a stack change."
 ---
+
 
 # Agent Factory
 

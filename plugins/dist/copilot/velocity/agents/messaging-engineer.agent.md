@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: messaging-engineer
 description: "Event producers, consumers, stream processing, and dead-letter queue handling. Activated when the stack includes Kafka, RabbitMQ, SQS, or similar messaging infrastructure. Designs event schemas using CONTEXT.md domain terms. Implements idempotent consumers. Handles offset management and consumer group coordination. Ensures event-driven slices have integration tests that test the full producer → broker → consumer path."
 ---
 

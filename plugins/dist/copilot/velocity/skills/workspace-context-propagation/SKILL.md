@@ -1,15 +1,8 @@
 ---
 name: workspace-context-propagation
-description: >-
-  Propagate workspace changes (CONTEXT.md, guardrails, standards) to all
-  connected repositories immediately. Run from the velocity-workspace repository
-  after updating shared assets. Notifies connected repos, writes workspace
-  snapshot copies of CONTEXT.md files, and triggers downstream sync signals.
-  Use when CI webhook propagation is not configured or for immediate sync.
-metadata:
-  surfaces:
-    - agent
+description: "Propagate workspace changes (CONTEXT.md, guardrails, standards) to all connected repositories immediately. Run from the velocity-workspace repository after updating shared assets. Notifies connected repos, writes workspace snapshot copies of CONTEXT.md files, and triggers downstream sync signals. Use when CI webhook propagation is not configured or for immediate sync."
 ---
+
 
 # Workspace Context Propagation
 

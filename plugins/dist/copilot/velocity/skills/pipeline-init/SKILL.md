@@ -1,14 +1,8 @@
 ---
 name: pipeline-init
-description: >-
-  Scaffold a new SDLC pipeline state file and commit it to the velocity-state
-  branch. Called after smart-router output is confirmed by the developer.
-  Creates <work-id>.yaml in .velocity/sdlc/state/ with all phases set to
-  pending. Does not modify the feature branch.
-metadata:
-  surfaces:
-    - agent
+description: "Scaffold a new SDLC pipeline state file and commit it to the velocity-state branch. Called after smart-router output is confirmed by the developer. Creates <work-id>.yaml in .velocity/sdlc/state/ with all phases set to pending. Does not modify the feature branch."
 ---
+
 
 # Pipeline Init
 

@@ -1,16 +1,8 @@
 ---
 name: adr-engine
-description: >-
-  Create, version, and index Architecture Decision Records. Applies the
-  three-criteria gate (hard-to-reverse, surprising without context, real
-  trade-off) before drafting. Assigns sequential IDs. Writes ADRs to
-  .velocity/artifacts/adrs/ and updates the knowledge-base index.
-  Invoked by grill-with-docs and domain-model when a qualifying decision
-  is made. Can also be invoked directly to record a decision retroactively.
-metadata:
-  surfaces:
-    - agent
+description: "Create, version, and index Architecture Decision Records. Applies the three-criteria gate (hard-to-reverse, surprising without context, real trade-off) before drafting. Assigns sequential IDs. Writes ADRs to .velocity/artifacts/adrs/ and updates the knowledge-base index. Invoked by grill-with-docs and domain-model when a qualifying decision is made. Can also be invoked directly to record a decision retroactively."
 ---
+
 
 # ADR Engine
 

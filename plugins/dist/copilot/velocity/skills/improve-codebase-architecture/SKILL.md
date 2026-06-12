@@ -1,16 +1,8 @@
 ---
 name: improve-codebase-architecture
-description: >-
-  Detect shallow module anti-patterns and surface deepening opportunities.
-  Finds places where understanding one concept requires bouncing between many
-  small files, where pure functions were extracted just for testability, and
-  where the codebase diverges from CONTEXT.md terminology. Produces a
-  prioritized list of refactoring candidates for developer approval.
-  Run periodically or after any significant surge of agent-driven development.
-metadata:
-  surfaces:
-    - agent
+description: "Detect shallow module anti-patterns and surface deepening opportunities. Finds places where understanding one concept requires bouncing between many small files, where pure functions were extracted just for testability, and where the codebase diverges from CONTEXT.md terminology. Produces a prioritized list of refactoring candidates for developer approval. Run periodically or after any significant surge of agent-driven development."
 ---
+
 
 # Improve Codebase Architecture
 

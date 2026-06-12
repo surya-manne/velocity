@@ -1,14 +1,8 @@
 ---
 name: guardrail-factory
-description: >-
-  Generate guardrail configuration and PreToolUse hooks tailored to the detected
-  project stack and workspace standards. Produces .velocity/guardrails/default.md
-  and hooks.json from Project Intelligence and Workspace Intelligence. Runs at
-  setup time and on every /sync. No developer configuration required.
-metadata:
-  surfaces:
-    - agent
+description: "Generate guardrail configuration and PreToolUse hooks tailored to the detected project stack and workspace standards. Produces .velocity/guardrails/default.md and hooks.json from Project Intelligence and Workspace Intelligence. Runs at setup time and on every /sync. No developer configuration required."
 ---
+
 
 # Guardrail Factory
 

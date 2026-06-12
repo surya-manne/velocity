@@ -1,14 +1,8 @@
 ---
 name: tdd
-description: >-
-  Red-green-refactor loop with design-for-testability. One failing test at a
-  time. Run in a fresh context window per task. Read the task definition and
-  CONTEXT.md before starting. Enforces the deep modules doctrine: simple
-  interfaces, complex implementations.
-metadata:
-  surfaces:
-    - agent
+description: "Red-green-refactor loop with design-for-testability. One failing test at a time. Run in a fresh context window per task. Read the task definition and CONTEXT.md before starting. Enforces the deep modules doctrine: simple interfaces, complex implementations."
 ---
+
 
 # TDD
 

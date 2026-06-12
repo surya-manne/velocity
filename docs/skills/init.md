@@ -194,7 +194,7 @@ cp velocity/skills/init/SKILL.md commands/velocity-init.md
 
 ```bash
 cp velocity/skills/init/SKILL.md .github/prompts/velocity-init.prompt.md
-# In Copilot: #velocity-init
+# In Copilot: #velocity:init
 ```
 
 </details>

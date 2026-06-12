@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: codebase-explorer
 description: "Navigates source code, git history, and existing patterns to answer questions about how the codebase works before implementation begins. Finds existing implementations of similar patterns, identifies module boundaries, and surfaces relevant test fixtures. Prevents the Engineer from duplicating existing functionality or violating established patterns."
 ---
 

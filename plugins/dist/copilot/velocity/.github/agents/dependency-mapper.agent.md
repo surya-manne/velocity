@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: dependency-mapper
 description: "Maps blocking relationships between tasks and slices. Identifies which tasks must complete before others can begin. Produces a dependency graph that the Engineer uses to sequence work and identify candidates for parallel execution. Flags circular dependencies and tasks that are unnecessarily serialized."
 ---
 

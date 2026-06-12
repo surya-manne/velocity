@@ -1,15 +1,8 @@
 ---
 name: copilot-adapter
-description: >-
-  Translate .velocity/ assets into native GitHub Copilot assets following
-  progressive disclosure. Generates lean .github/copilot-instructions.md,
-  AGENTS.md, and .github/prompts/ prompt files. Run automatically by /init
-  and /sync. Invoke manually to regenerate Copilot assets after editing
-  .velocity/ configs directly.
-metadata:
-  surfaces:
-    - agent
+description: "Translate .velocity/ assets into native GitHub Copilot assets following progressive disclosure. Generates lean .github/copilot-instructions.md, AGENTS.md, and .github/prompts/ prompt files. Run automatically by /init and /sync. Invoke manually to regenerate Copilot assets after editing .velocity/ configs directly."
 ---
+
 
 # GitHub Copilot Adapter
 

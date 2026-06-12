@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: reviewer
 description: "Reviews any artifact — PRs, ADRs, PRDs, slices, architecture docs — for completeness, consistency with CONTEXT.md, and standards compliance. Runs slice completeness checks, guardrail validation, and CONTEXT.md language drift detection. The Reviewer is the quality gate before merge. It does not block — it surfaces issues clearly and proposes fixes."
 ---
 

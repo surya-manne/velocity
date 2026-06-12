@@ -1,14 +1,8 @@
 ---
 name: ralph-propose
-description: >-
-  Draft targeted improvements to skill templates, agent configs, and guardrails
-  based on RALPH Learn patterns. Each proposal is a specific diff against the
-  current template with rationale. Produces proposals for developer review.
-  Run after ralph-learn produces a pattern summary.
-metadata:
-  surfaces:
-    - agent
+description: "Draft targeted improvements to skill templates, agent configs, and guardrails based on RALPH Learn patterns. Each proposal is a specific diff against the current template with rationale. Produces proposals for developer review. Run after ralph-learn produces a pattern summary."
 ---
+
 
 # RALPH Propose
 

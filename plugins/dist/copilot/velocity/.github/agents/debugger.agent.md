@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: debugger
 description: "Systematic root cause investigation. Reproduces bugs, traces failure paths, proposes fixes with minimal blast radius. Reads incidents and runbooks from the knowledge base before investigating. Documents the root cause and fix in a structured incident record stored in .velocity/knowledge-base/incidents/. Proposes a regression test to prevent recurrence."
 ---
 

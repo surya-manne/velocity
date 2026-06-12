@@ -1,16 +1,8 @@
 ---
 name: security-design
-description: >-
-  Produce a security design for a feature: threat model, trust boundary map,
-  data classification, auth/authz design, and compliance obligations. Aligned
-  to the detected security posture from project-context/security.md and
-  existing security ADRs. Stores the output under .velocity/artifacts/security/.
-  Invoked by the Security Agent or Architecture Agent when a feature touches
-  auth, PII, payments, trust boundaries, or public API surface.
-metadata:
-  surfaces:
-    - agent
+description: "Produce a security design for a feature: threat model, trust boundary map, data classification, auth/authz design, and compliance obligations. Aligned to the detected security posture from project-context/security.md and existing security ADRs. Stores the output under .velocity/artifacts/security/. Invoked by the Security Agent or Architecture Agent when a feature touches auth, PII, payments, trust boundaries, or public API surface."
 ---
+
 
 # Security Design
 

@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: security-architect
 description: "Security architecture design: authentication flows, authorization models, data classification, and compliance framework alignment. Produces threat models and security ADRs. Reviews proposed architectures for trust boundary violations, privilege escalation paths, and data exposure risks."
 ---
 

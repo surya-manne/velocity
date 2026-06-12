@@ -1,15 +1,8 @@
 ---
 name: gemini-adapter
-description: >-
-  Translate .velocity/ assets into native Gemini Code Assist assets following
-  progressive disclosure. Generates lean GEMINI.md, .gemini/agents/ agent
-  configurations, and .gemini/tools/ tool definitions. Run automatically by
-  /init and /sync. Invoke manually to regenerate Gemini assets after editing
-  .velocity/ configs directly.
-metadata:
-  surfaces:
-    - agent
+description: "Translate .velocity/ assets into native Gemini Code Assist assets following progressive disclosure. Generates lean GEMINI.md, .gemini/agents/ agent configurations, and .gemini/tools/ tool definitions. Run automatically by /init and /sync. Invoke manually to regenerate Gemini assets after editing .velocity/ configs directly."
 ---
+
 
 # Gemini Code Assist Adapter
 

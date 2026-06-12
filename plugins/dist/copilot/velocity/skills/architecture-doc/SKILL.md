@@ -1,16 +1,8 @@
 ---
 name: architecture-doc
-description: >-
-  Generate an architecture document for a feature or system that is consistent
-  with CONTEXT.md domain language and existing ADRs. Produces a structured
-  document covering system context, component design, data flows, API surface,
-  deployment topology, and architectural trade-offs. Stored under
-  .velocity/artifacts/architecture/. Invoked by the Architecture Agent before
-  implementation begins on any non-trivial feature.
-metadata:
-  surfaces:
-    - agent
+description: "Generate an architecture document for a feature or system that is consistent with CONTEXT.md domain language and existing ADRs. Produces a structured document covering system context, component design, data flows, API surface, deployment topology, and architectural trade-offs. Stored under .velocity/artifacts/architecture/. Invoked by the Architecture Agent before implementation begins on any non-trivial feature."
 ---
+
 
 # Architecture Doc
 

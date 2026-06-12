@@ -1,15 +1,8 @@
 ---
 name: ralph-consumer-annotate
-description: >-
-  RALPH Loop — Annotate step. Captures a quality rating and structured
-  feedback for a completed pipeline phase. Triggered at every human gate when
-  RALPH Loop is enabled in pipeline-config.yaml. Writes annotation to
-  .velocity/artifacts/ralph/<phase-run-id>.md. Developers fill in feedback
-  after reviewing artifacts; stubs are pre-populated with run context.
-metadata:
-  surfaces:
-    - agent
+description: "RALPH Loop — Annotate step. Captures a quality rating and structured feedback for a completed pipeline phase. Triggered at every human gate when RALPH Loop is enabled in pipeline-config.yaml. Writes annotation to .velocity/artifacts/ralph/<phase-run-id>.md. Developers fill in feedback after reviewing artifacts; stubs are pre-populated with run context."
 ---
+
 
 # RALPH Loop — Annotate
 

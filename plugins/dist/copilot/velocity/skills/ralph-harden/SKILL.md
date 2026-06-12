@@ -1,13 +1,8 @@
 ---
 name: ralph-harden
-description: >-
-  Apply approved RALPH proposals to skill templates, agent configs, and guardrails.
-  Regenerates affected assets. Logs traceability. Run after ralph-propose
-  proposals have been reviewed and approved by the developer.
-metadata:
-  surfaces:
-    - agent
+description: "Apply approved RALPH proposals to skill templates, agent configs, and guardrails. Regenerates affected assets. Logs traceability. Run after ralph-propose proposals have been reviewed and approved by the developer."
 ---
+
 
 # RALPH Harden
 

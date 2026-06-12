@@ -1,14 +1,8 @@
 ---
 name: workspace-setup
-description: >-
-  Initialize a velocity-workspace repository. Creates the workspace .velocity/
-  layout, registers repositories, generates the workspace-level context map,
-  shared guardrails, and shared standards. Run once on a new or existing
-  velocity-workspace repo.
-metadata:
-  surfaces:
-    - agent
+description: "Initialize a velocity-workspace repository. Creates the workspace .velocity/ layout, registers repositories, generates the workspace-level context map, shared guardrails, and shared standards. Run once on a new or existing velocity-workspace repo."
 ---
+
 
 # Workspace Setup
 
