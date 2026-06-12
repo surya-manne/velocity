@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: refactor
 description: "Identifies improvement opportunities. Runs improve-codebase-architecture to detect shallow modules, propose deepening opportunities, and surface places where tightly coupled modules create integration risk or where the codebase diverges from CONTEXT.md terminology. Ensures refactors preserve test coverage and do not change external behavior. Produces a prioritized list of refactoring candidates for developer approval — not a prescription."
 ---
 

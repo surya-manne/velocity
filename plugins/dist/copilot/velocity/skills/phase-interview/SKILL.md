@@ -1,14 +1,8 @@
 ---
 name: phase-interview
-description: >-
-  Per-phase Q&A interview. Runs at the start of every phase before the owning
-  agent begins execution. Reads current context and existing artifacts, then
-  generates 1–5 MECE questions with recommended answers. Records skipped
-  answers as flagged assumptions. Invoke at the start of each pipeline phase.
-metadata:
-  surfaces:
-    - agent
+description: "Per-phase Q&A interview. Runs at the start of every phase before the owning agent begins execution. Reads current context and existing artifacts, then generates 1–5 MECE questions with recommended answers. Records skipped answers as flagged assumptions. Invoke at the start of each pipeline phase."
 ---
+
 
 # Phase Interview
 

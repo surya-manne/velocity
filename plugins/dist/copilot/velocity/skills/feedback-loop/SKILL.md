@@ -1,15 +1,8 @@
 ---
 name: feedback-loop
-description: >-
-  Deterministic feedback gates enforced inside agent sessions during
-  implementation. Run typecheck after every generated file, full test suite
-  after every red-green-refactor cycle, lint before any commit. If any gate
-  fails, stop and fix before proceeding. Not a PR check — an in-session
-  implementation discipline.
-metadata:
-  surfaces:
-    - agent
+description: "Deterministic feedback gates enforced inside agent sessions during implementation. Run typecheck after every generated file, full test suite after every red-green-refactor cycle, lint before any commit. If any gate fails, stop and fix before proceeding. Not a PR check — an in-session implementation discipline."
 ---
+
 
 # Feedback Loop
 

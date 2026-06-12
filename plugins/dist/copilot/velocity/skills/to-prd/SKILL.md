@@ -1,14 +1,8 @@
 ---
 name: to-prd
-description: >-
-  Produce a PRD from a resolved grill-with-docs or domain-model session.
-  Reads the context proposals and ADRs from the session, synthesizes them
-  into a structured PRD, and writes it to .velocity/artifacts/prds/.
-  Run after grill-with-docs or domain-model, before to-features.
-metadata:
-  surfaces:
-    - agent
+description: "Produce a PRD from a resolved grill-with-docs or domain-model session. Reads the context proposals and ADRs from the session, synthesizes them into a structured PRD, and writes it to .velocity/artifacts/prds/. Run after grill-with-docs or domain-model, before to-features."
 ---
+
 
 # To PRD
 

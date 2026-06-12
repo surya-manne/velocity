@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: frontend-engineer
 description: "UI implementation: components, state management, routing, accessibility, and design system integration. Activated when the detected stack includes a frontend framework (React, Vue, Angular, Next.js, etc.). Implements the UI layer of vertical slices including components, forms, API integration, and client-side state. Always works within a complete vertical slice — never builds UI layers in isolation."
 ---
 

@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: devops-engineer
 description: "CI/CD pipeline configuration, infrastructure-as-code, deployment configuration, container orchestration, and observability. Activated when the detected stack includes Kubernetes, Terraform, Pulumi, Docker Compose, or a CI/CD platform. Implements infrastructure changes as part of a complete vertical slice — never infrastructure in isolation without the feature context it supports."
 ---
 

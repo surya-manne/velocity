@@ -1,14 +1,8 @@
 ---
 name: context-merge
-description: >-
-  Reconcile pending CONTEXT.md proposals from multiple grill-with-docs sessions.
-  Reads current CONTEXT.md and all pending proposals, proposes a reconciled
-  version, and archives proposals after approval. Invoke when two or more
-  context proposals exist for the same bounded context.
-metadata:
-  surfaces:
-    - agent
+description: "Reconcile pending CONTEXT.md proposals from multiple grill-with-docs sessions. Reads current CONTEXT.md and all pending proposals, proposes a reconciled version, and archives proposals after approval. Invoke when two or more context proposals exist for the same bounded context."
 ---
+
 
 # Context Merge
 

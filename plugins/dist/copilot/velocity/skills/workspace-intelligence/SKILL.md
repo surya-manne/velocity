@@ -1,15 +1,8 @@
 ---
 name: workspace-intelligence
-description: >-
-  Discover and build the multi-repo workspace graph. Reads all registered
-  repositories, maps bounded contexts across repos, validates CONTEXT.md
-  consistency, and writes workspace.md with the complete workspace graph.
-  Run automatically by /workspace-setup and /sync. Invoke manually when
-  repositories are added or removed from the workspace.
-metadata:
-  surfaces:
-    - agent
+description: "Discover and build the multi-repo workspace graph. Reads all registered repositories, maps bounded contexts across repos, validates CONTEXT.md consistency, and writes workspace.md with the complete workspace graph. Run automatically by /workspace-setup and /sync. Invoke manually when repositories are added or removed from the workspace."
 ---
+
 
 # Workspace Intelligence Engine
 

@@ -1,16 +1,8 @@
 ---
 name: phase-rollback
-description: >-
-  Revert pipeline state to a prior phase when a later phase reveals a problem
-  in earlier work. Marks the target phase as requires-revision, resets
-  current_phase, and pre-loads rollback context for the agent that re-runs
-  the phase. Only the target phase and downstream phases that depended on it
-  are affected — unrelated phases are preserved. Invoke when an agent detects
-  that an earlier phase artifact is incorrect.
-metadata:
-  surfaces:
-    - agent
+description: "Revert pipeline state to a prior phase when a later phase reveals a problem in earlier work. Marks the target phase as requires-revision, resets current_phase, and pre-loads rollback context for the agent that re-runs the phase. Only the target phase and downstream phases that depended on it are affected — unrelated phases are preserved. Invoke when an agent detects that an earlier phase artifact is incorrect."
 ---
+
 
 # Phase Rollback
 

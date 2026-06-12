@@ -1,16 +1,8 @@
 ---
 name: context-engine
-description: >-
-  Read, validate, and maintain CONTEXT.md files. Detects drift between the
-  glossary and the actual codebase, surfaces misaligned variable/file/schema
-  names, diffs pending proposals against the current glossary, and prepares
-  updates via the proposal mechanism. Invoked by grill-with-docs, domain-model,
-  and the Reviewer Agent. Not a replacement for grill-with-docs — this skill
-  validates and maintains what grill-with-docs produces.
-metadata:
-  surfaces:
-    - agent
+description: "Read, validate, and maintain CONTEXT.md files. Detects drift between the glossary and the actual codebase, surfaces misaligned variable/file/schema names, diffs pending proposals against the current glossary, and prepares updates via the proposal mechanism. Invoked by grill-with-docs, domain-model, and the Reviewer Agent. Not a replacement for grill-with-docs — this skill validates and maintains what grill-with-docs produces."
 ---
+
 
 # Context Engine
 

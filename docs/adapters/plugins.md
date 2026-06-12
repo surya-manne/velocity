@@ -49,13 +49,21 @@ VS Code Copilot has a native plugin manager.
 2. Go to Plugins -> Install Plugin from Source.
 3. Enter `https://github.com/surya-manne/velocity`.
 
-Invoke skills as prompts in Copilot Chat:
+Invoke skills in Copilot Chat:
 
 ```text
-#velocity-init
+#velocity:init
 ```
 
-The bundle contains `.github/copilot-instructions.md`, `.github/instructions/`, `.github/prompts/`, `.github/agents/`, `.github/skills/`, and `.github/velocity-resources/` (templates + schemas).
+The bundle exposes Velocity natively via two layouts:
+
+**Plugin root** (read by VS Code plugin manager — no settings required):
+- `skills/<name>/SKILL.md` — all Velocity skills, accessible as `velocity:<name>`
+- `agents/*.agent.md` — all Velocity agents, accessible as `@velocity:<name>`
+- `rules/velocity.instructions.md` — always-on instructions loaded automatically
+
+**`.github/` bundle** (for workspace-copy install via `install.sh` or manual copy):
+- `.github/copilot-instructions.md`, `.github/instructions/`, `.github/prompts/`, `.github/agents/`, `.github/skills/`, `.github/velocity-resources/` (templates + schemas)
 
 ## Plugins vs adapters
 

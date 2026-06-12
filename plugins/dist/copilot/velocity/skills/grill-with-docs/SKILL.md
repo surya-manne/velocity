@@ -1,14 +1,8 @@
 ---
 name: grill-with-docs
-description: >-
-  Context-aware interview for brownfield work. Reads CONTEXT.md, explores the
-  codebase, challenges assumptions one question at a time, refines domain
-  language, and generates ADRs for qualifying decisions. Use before any feature
-  work on an existing codebase. Default over grill-me when code exists.
-metadata:
-  surfaces:
-    - agent
+description: "Context-aware interview for brownfield work. Reads CONTEXT.md, explores the codebase, challenges assumptions one question at a time, refines domain language, and generates ADRs for qualifying decisions. Use before any feature work on an existing codebase. Default over grill-me when code exists."
 ---
+
 
 # Grill With Docs
 

@@ -1,15 +1,8 @@
 ---
 name: smart-router
-description: >-
-  SDLC entry point. Pre-loads context signals (git log, in-flight pipelines,
-  CONTEXT.md) then runs a three-question interview to detect work type and
-  select the correct pipeline variant. Outputs: selected variant, detected
-  context, first phase, owning agent. Use /velocity in Cursor or Claude Code.
-  Surfaces any in-flight pipeline for resume before starting a new one.
-metadata:
-  surfaces:
-    - agent
+description: "SDLC entry point. Pre-loads context signals (git log, in-flight pipelines, CONTEXT.md) then runs a three-question interview to detect work type and select the correct pipeline variant. Outputs: selected variant, detected context, first phase, owning agent. Use /velocity in Cursor or Claude Code. Surfaces any in-flight pipeline for resume before starting a new one."
 ---
+
 
 # Smart Router
 

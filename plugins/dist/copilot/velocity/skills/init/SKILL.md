@@ -1,15 +1,8 @@
 ---
-name: velocity-init
-description: >-
-  Initialize Velocity in this repository. Detects active AI tool, creates
-  .velocity/ layout, detects stack, writes context into the tool-native file
-  (CLAUDE.md, .github/copilot-instructions.md, .cursor/rules/velocity.mdc, or
-  GEMINI.md), wires agents and skills, and generates guardrail hooks. Run once
-  on any new or existing repository.
-metadata:
-  surfaces:
-    - agent
+name: init
+description: "Initialize Velocity in this repository. Detects active AI tool, creates .velocity/ layout, detects stack, writes context into the tool-native file (CLAUDE.md, .github/copilot-instructions.md, .cursor/rules/velocity.mdc, or GEMINI.md), wires agents and skills, and generates guardrail hooks. Run once on any new or existing repository."
 ---
+
 
 <!-- velocity-plugin: resource resolution -->
 > **Plugin resources.** This skill references files under `templates/...` and

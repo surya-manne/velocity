@@ -1,15 +1,8 @@
 ---
 name: domain-model
-description: >-
-  Align a plan to CONTEXT.md and existing ADRs before writing a PRD. Reads
-  the existing domain model, checks the proposed work against established
-  terms and decisions, surfaces conflicts, and updates CONTEXT.md before
-  any PRD is written. Use when a PRD exists elsewhere and needs domain
-  alignment, or when starting planning in a brownfield context.
-metadata:
-  surfaces:
-    - agent
+description: "Align a plan to CONTEXT.md and existing ADRs before writing a PRD. Reads the existing domain model, checks the proposed work against established terms and decisions, surfaces conflicts, and updates CONTEXT.md before any PRD is written. Use when a PRD exists elsewhere and needs domain alignment, or when starting planning in a brownfield context."
 ---
+
 
 # Domain Model
 

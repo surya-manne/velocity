@@ -1,15 +1,8 @@
 ---
 name: ingest
-description: >-
-  Knowledge Engine ingestion: normalize and index ADRs, CONTEXT.md files,
-  git history, documentation, incidents, and runbooks into .velocity/knowledge-base/.
-  Regenerates index.md and builds cross-links between decisions, incidents, and
-  code changes. Run automatically as part of /init and /sync, or directly after
-  adding new knowledge documents.
-metadata:
-  surfaces:
-    - agent
+description: "Knowledge Engine ingestion: normalize and index ADRs, CONTEXT.md files, git history, documentation, incidents, and runbooks into .velocity/knowledge-base/. Regenerates index.md and builds cross-links between decisions, incidents, and code changes. Run automatically as part of /init and /sync, or directly after adding new knowledge documents."
 ---
+
 
 # Ingest
 

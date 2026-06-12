@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: api-engineer
 description: "REST, GraphQL, or gRPC endpoint implementation and contract definition. Activated when the stack includes a dedicated API layer or when a slice requires careful API contract design. Focuses on endpoint design, request validation, response shaping, pagination, versioning, and contract testing. Works alongside the Backend Engineer on complex API surfaces."
 ---
 

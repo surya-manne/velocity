@@ -1,14 +1,8 @@
 ---
 name: validate
-description: >-
-  Run guardrail checks against the current branch. Validates slice completeness,
-  CONTEXT.md term consistency, test coverage, security gates, and API standards.
-  Use before opening a PR or when CI guardrail checks are failing. Produces a
-  pass/fail checklist with specific remediation for each failure.
-metadata:
-  surfaces:
-    - agent
+description: "Run guardrail checks against the current branch. Validates slice completeness, CONTEXT.md term consistency, test coverage, security gates, and API standards. Use before opening a PR or when CI guardrail checks are failing. Produces a pass/fail checklist with specific remediation for each failure."
 ---
+
 
 # Validate
 

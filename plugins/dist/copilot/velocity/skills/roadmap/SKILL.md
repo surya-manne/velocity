@@ -1,14 +1,8 @@
 ---
 name: roadmap
-description: >-
-  Generate a prioritized roadmap from a feature board. Sequences features by
-  user value, dependency order, and delivery risk. Produces a phased delivery
-  plan where each phase ends with demonstrable, shippable software.
-  Run after to-features, before engineering begins.
-metadata:
-  surfaces:
-    - agent
+description: "Generate a prioritized roadmap from a feature board. Sequences features by user value, dependency order, and delivery risk. Produces a phased delivery plan where each phase ends with demonstrable, shippable software. Run after to-features, before engineering begins."
 ---
+
 
 # Roadmap
 

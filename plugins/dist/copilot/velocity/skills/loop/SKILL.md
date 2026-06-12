@@ -1,16 +1,8 @@
 ---
 name: loop
-description: >-
-  Autonomous agent loop. Operates in two modes: pipeline mode (drives features
-  through SDLC pipeline phases, reading state from the velocity-state branch)
-  and task mode (reads the feature board, picks the next unblocked task,
-  implements through TDD). Pauses for human gates. Each phase or task runs in a
-  fresh context window. Use /loop in Cursor, /velocity-loop in Claude Code,
-  velocity-loop.prompt.md in Copilot.
-metadata:
-  surfaces:
-    - agent
+description: "Autonomous agent loop. Operates in two modes: pipeline mode (drives features through SDLC pipeline phases, reading state from the velocity-state branch) and task mode (reads the feature board, picks the next unblocked task, implements through TDD). Pauses for human gates. Each phase or task runs in a fresh context window. Use /loop in Cursor, /velocity-loop in Claude Code, velocity-loop.prompt.md in Copilot."
 ---
+
 
 # Loop
 

@@ -1,14 +1,8 @@
 ---
 name: ralph-learn
-description: >-
-  Extract recurring failure patterns from accumulated RALPH annotations.
-  Process N annotations for a skill and surface the highest-priority
-  improvement opportunities. Run when 5+ annotations exist for a skill.
-  Produces a pattern summary that feeds ralph-propose.
-metadata:
-  surfaces:
-    - agent
+description: "Extract recurring failure patterns from accumulated RALPH annotations. Process N annotations for a skill and surface the highest-priority improvement opportunities. Run when 5+ annotations exist for a skill. Produces a pattern summary that feeds ralph-propose."
 ---
+
 
 # RALPH Learn
 

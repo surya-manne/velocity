@@ -19,7 +19,7 @@ The bundle is plain text. It includes no archive, binary, package manager depend
 
 | Assistant | Copy `velocity-init.md` to | Invoke |
 | --------- | -------------------------- | ------ |
-| VS Code / GitHub Copilot | `.github/prompts/velocity-init.prompt.md` | `#velocity-init` |
+| VS Code / GitHub Copilot | `.github/prompts/velocity-init.prompt.md` | `#velocity:init` |
 | Cursor | `.cursor/skills/velocity-init.md` | `/velocity-init` |
 | Claude Code | `commands/velocity-init.md` | `/velocity-init` |
 

@@ -25,7 +25,7 @@ The Marketplace is the distribution layer for Velocity extensions. Packs bundle 
 ```
 
 ```text [Copilot]
-#velocity-marketplace
+#velocity:marketplace
 ```
 
 ```text [Gemini]

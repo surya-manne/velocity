@@ -1,14 +1,8 @@
 ---
 name: handoff
-description: >-
-  Compact context artifact for clean hand-off at the end of each slice.
-  Produces the only context the next session needs — no conversation history
-  required. Write at the end of every slice before closing the context window.
-  The next Engineer Agent picks up the handoff document, not the chat history.
-metadata:
-  surfaces:
-    - agent
+description: "Compact context artifact for clean hand-off at the end of each slice. Produces the only context the next session needs — no conversation history required. Write at the end of every slice before closing the context window. The next Engineer Agent picks up the handoff document, not the chat history."
 ---
+
 
 # Handoff
 

@@ -1,15 +1,8 @@
 ---
 name: claude-code-adapter
-description: >-
-  Translate .velocity/ assets into native Claude Code assets following
-  progressive disclosure. Generates lean CLAUDE.md, subagents/, commands/, and
-  hooks/. Run automatically by /velocity-init and /velocity-sync. Invoke
-  manually to regenerate Claude Code assets after editing .velocity/ configs
-  directly.
-metadata:
-  surfaces:
-    - agent
+description: "Translate .velocity/ assets into native Claude Code assets following progressive disclosure. Generates lean CLAUDE.md, subagents/, commands/, and hooks/. Run automatically by /velocity-init and /velocity-sync. Invoke manually to regenerate Claude Code assets after editing .velocity/ configs directly."
 ---
+
 
 # Claude Code Adapter
 

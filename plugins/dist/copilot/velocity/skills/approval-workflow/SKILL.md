@@ -1,16 +1,8 @@
 ---
 name: approval-workflow
-description: >-
-  Request and record explicit sign-off for high-risk changes. Integrates with
-  the loop skill's approval gate, the validate skill's breaking-change check,
-  and the governance enterprise-controls config. Writes approval requests to
-  .velocity/artifacts/approvals/ and logs every decision to the audit trail.
-  Supports in-session approval (developer types approve/reject in the assistant)
-  and out-of-band approval (GitHub PR review, configurable via enterprise-controls).
-metadata:
-  surfaces:
-    - agent
+description: "Request and record explicit sign-off for high-risk changes. Integrates with the loop skill's approval gate, the validate skill's breaking-change check, and the governance enterprise-controls config. Writes approval requests to .velocity/artifacts/approvals/ and logs every decision to the audit trail. Supports in-session approval (developer types approve/reject in the assistant) and out-of-band approval (GitHub PR review, configurable via enterprise-controls)."
 ---
+
 
 # Approval Workflow
 

@@ -1,14 +1,8 @@
 ---
 name: pipeline-status
-description: >-
-  Show the current state of all in-flight SDLC pipelines for this repository.
-  Reads all state files on the velocity-state branch and produces a compact
-  dashboard: current phase, gate status, blocking relationships, and next
-  action for each work item. Use /pipeline-status or /velocity-status.
-metadata:
-  surfaces:
-    - agent
+description: "Show the current state of all in-flight SDLC pipelines for this repository. Reads all state files on the velocity-state branch and produces a compact dashboard: current phase, gate status, blocking relationships, and next action for each work item. Use /pipeline-status or /velocity-status."
 ---
+
 
 # Pipeline Status
 

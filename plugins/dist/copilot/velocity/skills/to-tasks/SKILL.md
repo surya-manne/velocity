@@ -1,14 +1,8 @@
 ---
 name: to-tasks
-description: >-
-  Decompose a feature into independently implementable tasks with explicit
-  blocking relationships. Each task is small enough to be completed in one
-  tdd session (one fresh context window). Run after to-features, before
-  starting tdd on each task.
-metadata:
-  surfaces:
-    - agent
+description: "Decompose a feature into independently implementable tasks with explicit blocking relationships. Each task is small enough to be completed in one tdd session (one fresh context window). Run after to-features, before starting tdd on each task."
 ---
+
 
 # To Tasks
 

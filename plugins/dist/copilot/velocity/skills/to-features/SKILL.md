@@ -1,13 +1,8 @@
 ---
 name: to-features
-description: >-
-  Decompose a PRD into a feature board of vertical-slice features. Each feature
-  has a clear user-facing outcome, layer coverage definition, out-of-scope
-  boundary, and tracer bullet scope. Run after to-prd, before to-tasks.
-metadata:
-  surfaces:
-    - agent
+description: "Decompose a PRD into a feature board of vertical-slice features. Each feature has a clear user-facing outcome, layer coverage definition, out-of-scope boundary, and tracer bullet scope. Run after to-prd, before to-tasks."
 ---
+
 
 # To Features
 

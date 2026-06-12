@@ -1,15 +1,8 @@
 ---
 name: ralph-consumer-harden
-description: >-
-  RALPH Loop — Harden step. Applies developer-approved proposals from a
-  propose artifact to this project's local .velocity/skills/, .velocity/agents/,
-  and .velocity/guardrails/ files. Logs all changes for traceability. Never
-  modifies Velocity platform templates. Run after developer has reviewed and
-  approved proposals in the propose artifact.
-metadata:
-  surfaces:
-    - agent
+description: "RALPH Loop — Harden step. Applies developer-approved proposals from a propose artifact to this project's local .velocity/skills/, .velocity/agents/, and .velocity/guardrails/ files. Logs all changes for traceability. Never modifies Velocity platform templates. Run after developer has reviewed and approved proposals in the propose artifact."
 ---
+
 
 # RALPH Loop — Harden
 

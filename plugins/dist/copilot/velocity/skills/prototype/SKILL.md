@@ -1,15 +1,8 @@
 ---
 name: prototype
-description: >-
-  Throwaway code to answer product, UI, or state questions before committing
-  to a slice. Time-boxed. Scoped to a single decision. Never merged.
-  Use before to-prd or before complex slice-design when the right approach
-  is genuinely unknown. After prototyping, run grill-with-docs to lock in
-  the validated approach.
-metadata:
-  surfaces:
-    - agent
+description: "Throwaway code to answer product, UI, or state questions before committing to a slice. Time-boxed. Scoped to a single decision. Never merged. Use before to-prd or before complex slice-design when the right approach is genuinely unknown. After prototyping, run grill-with-docs to lock in the validated approach."
 ---
+
 
 # Prototype
 

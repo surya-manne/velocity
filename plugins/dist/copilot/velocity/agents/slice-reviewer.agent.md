@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: slice-reviewer
 description: "End-to-end completeness check for any PR or proposed slice. Verifies: (1) the PR touches all required layers for the user-facing outcome it claims, (2) tests exist at every layer touched, (3) the acceptance criteria stated in the task are demonstrably satisfied, (4) no horizontal anti-pattern is present. Produces a structured review with pass/fail per check and specific remediation for any failures."
 ---
 

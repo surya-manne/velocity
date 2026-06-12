@@ -1,17 +1,8 @@
 ---
 name: design-intelligence
-description: >-
-  Produce user flows, screen specifications, design system documentation, and
-  design tool integration contracts (Figma component map, Storybook story
-  index). Invoked by the UX Agent or directly by the developer when a feature
-  requires UI design before implementation. Uses CONTEXT.md domain terms in
-  all screen and flow descriptions. Stores output under
-  .velocity/artifacts/design/. Produces machine-readable contracts that the
-  Engineer can implement without further clarification.
-metadata:
-  surfaces:
-    - agent
+description: "Produce user flows, screen specifications, design system documentation, and design tool integration contracts (Figma component map, Storybook story index). Invoked by the UX Agent or directly by the developer when a feature requires UI design before implementation. Uses CONTEXT.md domain terms in all screen and flow descriptions. Stores output under .velocity/artifacts/design/. Produces machine-readable contracts that the Engineer can implement without further clarification."
 ---
+
 
 # Design Intelligence
 

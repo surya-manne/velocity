@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: product
 description: "Product strategy, discovery, roadmap, and PRD generation. Runs grill-with-docs and grill-me for product discovery. Produces PRDs using to-prd. Advises on feature prioritization, user outcomes, and release scope. Does not implement features — defines what to build and why. Consulted at the start of every new feature cycle and during roadmap planning."
 ---
 

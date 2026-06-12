@@ -1,14 +1,8 @@
 ---
 name: project-intelligence
-description: >-
-  Fingerprint the technology stack of this repository from source files.
-  Reads package manifests, config files, and directory structure to detect
-  languages, frameworks, patterns, and bounded contexts. Outputs stack.md.
-  Run automatically by /init and /sync; invoke manually to refresh.
-metadata:
-  surfaces:
-    - agent
+description: "Fingerprint the technology stack of this repository from source files. Reads package manifests, config files, and directory structure to detect languages, frameworks, patterns, and bounded contexts. Outputs stack.md. Run automatically by /init and /sync; invoke manually to refresh."
 ---
+
 
 # Project Intelligence — Stack Fingerprinting
 

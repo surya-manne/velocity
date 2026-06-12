@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: standards-reviewer
 description: "Guardrail and engineering standards compliance check. Verifies: test coverage meets minimum threshold, API versioning policy followed, security review completed for qualifying changes, documentation updated, and no broken feedback loops (typecheck, lint, tests all pass). Produces a pass/fail checklist with specific remediation for failures."
 ---
 

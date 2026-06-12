@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: researcher
 description: "Investigates unknowns before work begins. Explores the codebase, reads ADRs and CONTEXT.md, surfaces relevant prior decisions, and summarises findings for the Engineer or a specialist agent. Runs before any significant feature work to ensure the implementing agent has accurate situational awareness. Prevents the Engineer from re-discovering known patterns or violating existing decisions made in prior sessions."
 ---
 

@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: planner
 description: "Breaks down any goal into a sequenced, scoped plan. Runs grill-with-docs, to-prd, to-features, and to-tasks. Detects horizontal anti-patterns in proposed plans and enforces vertical slice decomposition. The Planner ensures that before any implementation begins, the goal is fully understood, the design tree is resolved, and the work is decomposed into independently implementable tasks with clear blocking relationships."
 ---
 

@@ -1,17 +1,8 @@
 ---
 name: api-design
-description: >-
-  Design an API aligned to the project's detected API style (REST, GraphQL, or
-  gRPC) and produce an OpenAPI spec scaffold (or equivalent). Validates every
-  endpoint name and resource term against CONTEXT.md. Applies API versioning
-  rules from project-context/api.md. Checks proposed design against accepted
-  API ADRs. Stores the spec under .velocity/artifacts/api/. Invoked by the
-  Architecture Agent or API Architect subagent when a feature introduces new
-  API surface.
-metadata:
-  surfaces:
-    - agent
+description: "Design an API aligned to the project's detected API style (REST, GraphQL, or gRPC) and produce an OpenAPI spec scaffold (or equivalent). Validates every endpoint name and resource term against CONTEXT.md. Applies API versioning rules from project-context/api.md. Checks proposed design against accepted API ADRs. Stores the spec under .velocity/artifacts/api/. Invoked by the Architecture Agent or API Architect subagent when a feature introduces new API surface."
 ---
+
 
 # API Design
 

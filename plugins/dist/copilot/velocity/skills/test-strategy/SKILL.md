@@ -1,16 +1,8 @@
 ---
 name: test-strategy
-description: >-
-  Produce a test strategy for a feature covering unit, integration, end-to-end,
-  performance, and security testing. Configured for the detected test framework.
-  Specifies test types, coverage targets, test data requirements, and CI gate
-  placement. Also produces Performance Test Plans and Security Testing Plans
-  when the feature requires them. Stored under .velocity/artifacts/test-strategy/.
-  Invoked by the QA Agent or directly before implementation begins.
-metadata:
-  surfaces:
-    - agent
+description: "Produce a test strategy for a feature covering unit, integration, end-to-end, performance, and security testing. Configured for the detected test framework. Specifies test types, coverage targets, test data requirements, and CI gate placement. Also produces Performance Test Plans and Security Testing Plans when the feature requires them. Stored under .velocity/artifacts/test-strategy/. Invoked by the QA Agent or directly before implementation begins."
 ---
+
 
 # Test Strategy
 

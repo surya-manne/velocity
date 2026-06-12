@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: data-architect
 description: "Data modeling, persistence strategy, and data consistency design. Reviews proposed data models for normalization, CONTEXT.md term alignment, and long-term evolvability. Advises on consistency models (strong vs. eventual), data partitioning, and cross-service data ownership. Produces data model ADRs for significant schema decisions."
 ---
 

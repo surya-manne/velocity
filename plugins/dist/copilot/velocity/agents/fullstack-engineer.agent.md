@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: fullstack-engineer
 description: "Spans UI, API, and persistence in a single slice. The default Engineer subagent when no specific stack signals force specialization. Implements complete vertical slices end-to-end without handing off between specialist subagents. Most efficient for small-to-medium repos where one engineer owns the full stack. Activated by default; replaced by specialist subagent combinations when a specific stack (e.g., Spring Boot + React) is detected."
 ---
 

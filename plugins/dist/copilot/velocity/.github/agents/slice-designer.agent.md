@@ -1,5 +1,6 @@
 ---
 mode: agent
+name: slice-designer
 description: "Decomposes any epic or feature into tracer-bullet vertical slices with defined user-facing outcomes, layer coverage, out-of-scope boundaries, and minimum lovable scope. Runs the grill-me-vertical-slice interview before accepting any decomposition. Detects and rejects horizontal anti-patterns in proposed plans (e.g., \"Sprint 1: all DB schemas\"). Ensures each slice can be merged independently and delivers demonstrable value to a user."
 ---
 

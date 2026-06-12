@@ -1,14 +1,8 @@
 ---
 name: cursor-adapter
-description: >-
-  Translate .velocity/ assets into native Cursor assets following progressive
-  disclosure. Generates lean .cursor/rules/, .cursor/agents/, .cursor/skills/,
-  and hooks.json. Run automatically by /init and /sync. Invoke manually
-  to regenerate Cursor assets after editing .velocity/ configs directly.
-metadata:
-  surfaces:
-    - agent
+description: "Translate .velocity/ assets into native Cursor assets following progressive disclosure. Generates lean .cursor/rules/, .cursor/agents/, .cursor/skills/, and hooks.json. Run automatically by /init and /sync. Invoke manually to regenerate Cursor assets after editing .velocity/ configs directly."
 ---
+
 
 # Cursor Adapter
 

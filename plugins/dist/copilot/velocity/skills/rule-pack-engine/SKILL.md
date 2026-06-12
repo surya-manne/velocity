@@ -1,16 +1,8 @@
 ---
 name: rule-pack-engine
-description: >-
-  Import external rule and standard ecosystems into Velocity. Reads the rule-packs
-  manifest (.velocity/rule-packs.md), fetches rules from each configured source
-  (Agent Rules Books, Cursor community packs, Claude Instructions, Copilot
-  Instructions, internal company standards), normalizes them into Velocity's internal
-  model, deduplicates, and converts rules into Skills and Guardrails. Runs as part
-  of /init and /sync. Zero manual rule authoring for any standard stack.
-metadata:
-  surfaces:
-    - agent
+description: "Import external rule and standard ecosystems into Velocity. Reads the rule-packs manifest (.velocity/rule-packs.md), fetches rules from each configured source (Agent Rules Books, Cursor community packs, Claude Instructions, Copilot Instructions, internal company standards), normalizes them into Velocity's internal model, deduplicates, and converts rules into Skills and Guardrails. Runs as part of /init and /sync. Zero manual rule authoring for any standard stack."
 ---
+
 
 # Rule Pack Engine
 

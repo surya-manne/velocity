@@ -26,14 +26,16 @@ https://github.com/surya-manne/velocity
 
 ### Option 3: Offline
 
-Copy the init skill file into the location your assistant reads prompts from:
+Copy the full bundle for your assistant into your repository:
 
 <details>
 <summary><strong>VS Code Copilot</strong></summary>
 
 ```bash
-mkdir -p .github/prompts
-cp /path/to/velocity/skills/init/SKILL.md .github/prompts/velocity-init.prompt.md
+npx degit surya-manne/velocity/plugins/dist/copilot/velocity /tmp/velocity-copilot \
+  && cp -R /tmp/velocity-copilot/.github/. .github/ \
+  && cp /tmp/velocity-copilot/AGENTS.md ./AGENTS.md \
+  && rm -rf /tmp/velocity-copilot
 ```
 
 </details>
@@ -42,7 +44,7 @@ cp /path/to/velocity/skills/init/SKILL.md .github/prompts/velocity-init.prompt.m
 <summary><strong>Cursor</strong></summary>
 
 ```bash
-cp /path/to/velocity/skills/init/SKILL.md .cursor/skills/velocity-init.md
+npx degit surya-manne/velocity/plugins/dist/cursor/velocity ~/.cursor/plugins/local/velocity
 ```
 
 </details>
@@ -51,8 +53,8 @@ cp /path/to/velocity/skills/init/SKILL.md .cursor/skills/velocity-init.md
 <summary><strong>Claude Code</strong></summary>
 
 ```bash
-mkdir -p commands
-cp /path/to/velocity/skills/init/SKILL.md commands/velocity-init.md
+/plugin marketplace add https://github.com/surya-manne/velocity
+/plugin install velocity
 ```
 
 </details>
@@ -63,7 +65,7 @@ Open a new AI chat and run the init command:
 
 | Assistant       | Command           |
 | --------------- | ----------------- |
-| VS Code Copilot | `#velocity-init`  |
+| VS Code Copilot | `#velocity:init`  |
 | Cursor          | `/velocity-init`  |
 | Claude Code     | `/velocity-init`  |
 

@@ -1,16 +1,8 @@
 ---
 name: sync
-description: >-
-  Pull latest workspace intelligence and regenerate Velocity assets. Checks
-  workspace connection, pulls shared context, then runs delta Project
-  Intelligence, Agent Factory, Skill Factory, Cursor Adapter, and Claude Code
-  Adapter. Use after dependency changes, architectural shifts, or when Velocity
-  detects stale assets at session start. Also available as /velocity-sync in
-  Claude Code.
-metadata:
-  surfaces:
-    - agent
+description: "Pull latest workspace intelligence and regenerate Velocity assets. Checks workspace connection, pulls shared context, then runs delta Project Intelligence, Agent Factory, Skill Factory, Cursor Adapter, and Claude Code Adapter. Use after dependency changes, architectural shifts, or when Velocity detects stale assets at session start. Also available as /velocity-sync in Claude Code."
 ---
+
 
 <!-- velocity-plugin: resource resolution -->
 > **Plugin resources.** This skill references files under `templates/...` and

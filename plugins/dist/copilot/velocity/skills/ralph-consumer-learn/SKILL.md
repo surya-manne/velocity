@@ -1,15 +1,8 @@
 ---
 name: ralph-consumer-learn
-description: >-
-  RALPH Loop — Learn step. Reads 5+ rated annotations for a skill or phase
-  and extracts recurring failure patterns, consistent gaps, and quality
-  regressions. Scoped to this project's deployed skill instances only. Produces
-  a learn artifact at .velocity/artifacts/ralph/learn-<skill>-<date>.md.
-  Run after 5+ annotations have been rated for the same skill or phase.
-metadata:
-  surfaces:
-    - agent
+description: "RALPH Loop — Learn step. Reads 5+ rated annotations for a skill or phase and extracts recurring failure patterns, consistent gaps, and quality regressions. Scoped to this project's deployed skill instances only. Produces a learn artifact at .velocity/artifacts/ralph/learn-<skill>-<date>.md. Run after 5+ annotations have been rated for the same skill or phase."
 ---
+
 
 # RALPH Loop — Learn
 

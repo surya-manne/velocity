@@ -15,4 +15,4 @@ cp "$TMP/AGENTS.md" ./AGENTS.md
 rm -rf "$TMP"
 
 echo "Installed .github/ bundle and AGENTS.md into $(pwd)"
-echo "Reload VS Code, then run #velocity-init in Copilot Chat."
+echo "Reload VS Code, then run #velocity:init in Copilot Chat."
