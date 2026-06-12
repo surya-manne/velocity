@@ -1,0 +1,242 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://velocity.dev/schemas/project-intelligence.schema.json",
+  "title": "ProjectIntelligence",
+  "description": "Stack fingerprint output produced by the project-intelligence skill. Consumed by Agent Factory and Skill Factory.",
+  "type": "object",
+  "required": ["version", "detected_at", "languages", "stack"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["2.0"]
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this fingerprint was generated"
+    },
+    "languages": {
+      "type": "array",
+      "description": "Primary programming languages detected",
+      "items": {
+        "type": "object",
+        "required": ["name", "confidence"],
+        "properties": {
+          "name": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "primary": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "stack": {
+      "type": "object",
+      "description": "Detected technology stack",
+      "properties": {
+        "frontend": {
+          "type": "object",
+          "properties": {
+            "framework": {
+              "type": "string",
+              "examples": ["React", "Vue", "Angular", "Next.js", "Svelte"]
+            },
+            "ui_library": { "type": "string" },
+            "state_management": { "type": "string" },
+            "styling": { "type": "string" }
+          }
+        },
+        "backend": {
+          "type": "object",
+          "properties": {
+            "framework": {
+              "type": "string",
+              "examples": [
+                "Spring Boot",
+                "Express",
+                "FastAPI",
+                "Rails",
+                "Django",
+                "NestJS",
+                "Go stdlib"
+              ]
+            },
+            "language": { "type": "string" },
+            "runtime": { "type": "string" }
+          }
+        },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "primary_db": {
+              "type": "string",
+              "examples": [
+                "PostgreSQL",
+                "MySQL",
+                "MongoDB",
+                "DynamoDB",
+                "SQLite"
+              ]
+            },
+            "orm": { "type": "string" },
+            "cache": { "type": "string" },
+            "search": { "type": "string" }
+          }
+        },
+        "messaging": {
+          "type": "object",
+          "properties": {
+            "broker": {
+              "type": "string",
+              "examples": ["Kafka", "RabbitMQ", "SQS", "Pub/Sub", "NATS"]
+            },
+            "pattern": {
+              "type": "string",
+              "examples": ["event-driven", "pub-sub", "request-reply"]
+            }
+          }
+        },
+        "api_style": {
+          "type": "string",
+          "enum": ["REST", "GraphQL", "gRPC", "tRPC", "mixed"]
+        },
+        "architecture_patterns": {
+          "type": "array",
+          "description": "High-level architectural patterns detected",
+          "items": {
+            "type": "string",
+            "examples": [
+              "DDD",
+              "Event Sourcing",
+              "CQRS",
+              "Hexagonal",
+              "Microservices",
+              "Monolith",
+              "Modular Monolith",
+              "Serverless"
+            ]
+          }
+        },
+        "infrastructure": {
+          "type": "object",
+          "properties": {
+            "cloud": {
+              "type": "string",
+              "examples": ["AWS", "GCP", "Azure", "multi-cloud"]
+            },
+            "containers": {
+              "type": "string",
+              "examples": ["Docker", "Kubernetes"]
+            },
+            "iac": {
+              "type": "string",
+              "examples": ["Terraform", "Pulumi", "CDK", "CloudFormation"]
+            }
+          }
+        },
+        "testing": {
+          "type": "object",
+          "properties": {
+            "unit": {
+              "type": "string",
+              "examples": [
+                "Jest",
+                "Vitest",
+                "JUnit",
+                "pytest",
+                "RSpec",
+                "Go testing"
+              ]
+            },
+            "integration": { "type": "string" },
+            "e2e": {
+              "type": "string",
+              "examples": ["Playwright", "Cypress", "Selenium"]
+            },
+            "coverage_tool": { "type": "string" }
+          }
+        },
+        "ci_cd": {
+          "type": "object",
+          "properties": {
+            "platform": {
+              "type": "string",
+              "examples": [
+                "GitHub Actions",
+                "GitLab CI",
+                "CircleCI",
+                "Jenkins",
+                "Buildkite"
+              ]
+            },
+            "config_path": { "type": "string" }
+          }
+        }
+      }
+    },
+    "bounded_contexts": {
+      "type": "array",
+      "description": "Detected bounded contexts from directory structure, module names, and package organization",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "evidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "paths": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "evidence": {
+            "type": "string",
+            "description": "How this context was detected (e.g. 'directory: src/payments/, module: com.acme.payments')"
+          }
+        }
+      }
+    },
+    "repo_type": {
+      "type": "string",
+      "enum": ["single-repo", "monorepo", "part-of-multi-repo"],
+      "description": "Repository topology"
+    },
+    "monorepo_structure": {
+      "type": "object",
+      "description": "Present only when repo_type = monorepo",
+      "properties": {
+        "tool": {
+          "type": "string",
+          "examples": [
+            "Nx",
+            "Turborepo",
+            "Lerna",
+            "pnpm workspaces",
+            "Gradle multi-project",
+            "Maven multi-module"
+          ]
+        },
+        "apps": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "services": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "packages": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "signals_used": {
+      "type": "array",
+      "description": "Files and patterns used to produce this fingerprint (for traceability and delta detection)",
+      "items": { "type": "string" }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Overall fingerprint confidence score"
+    }
+  },
+  "additionalProperties": false
+}

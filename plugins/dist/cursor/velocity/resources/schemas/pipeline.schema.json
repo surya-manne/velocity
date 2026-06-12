@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://velocity.dev/schemas/pipeline.schema.json",
+  "title": "PipelineDefinition",
+  "description": "Velocity SDLC pipeline — defines phase sequences for each work-type variant",
+  "type": "object",
+  "required": ["id", "version", "pipeline_variants"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique pipeline configuration identifier (kebab-case)",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of this pipeline definition",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this pipeline configuration"
+    },
+    "phases": {
+      "type": "object",
+      "description": "Phase definitions keyed by phase id",
+      "additionalProperties": {
+        "$ref": "#/definitions/PhaseDefinition"
+      }
+    },
+    "pipeline_variants": {
+      "type": "object",
+      "description": "Map of work-type variant id to ordered phase id array",
+      "properties": {
+        "new-feature": {
+          "type": "array",
+          "description": "Phase sequence for new feature work",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "bug-fix": {
+          "type": "array",
+          "description": "Phase sequence for bug fix work",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "extend": {
+          "type": "array",
+          "description": "Phase sequence for extending an existing feature",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "refactor": {
+          "type": "array",
+          "description": "Phase sequence for refactoring work",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    }
+  },
+  "definitions": {
+    "PhaseDefinition": {
+      "type": "object",
+      "required": ["id", "name", "owning_agent", "gate_type"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Phase identifier (kebab-case)",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name shown at human gate presentation"
+        },
+        "owning_agent": {
+          "type": "string",
+          "description": "Agent responsible for executing this phase",
+          "enum": [
+            "product",
+            "architect",
+            "planner",
+            "engineer",
+            "qa",
+            "reviewer",
+            "debugger",
+            "researcher",
+            "refactor"
+          ]
+        },
+        "key_skills": {
+          "type": "array",
+          "description": "Velocity skill ids to invoke during this phase",
+          "items": { "type": "string" }
+        },
+        "exit_artifact": {
+          "type": "string",
+          "description": "Description of the primary artifact produced by this phase"
+        },
+        "gate_type": {
+          "type": "string",
+          "description": "Type of exit gate for this phase",
+          "enum": ["automated", "human", "both"]
+        },
+        "skippable": {
+          "type": "boolean",
+          "description": "Whether this phase can be skipped with a justification",
+          "default": true
+        },
+        "artifact_dir": {
+          "type": "string",
+          "description": "Directory within .velocity/artifacts/ where phase artifacts are stored"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

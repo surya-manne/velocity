@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://velocity.dev/schemas/context-map.schema.json",
+  "title": "ContextMap",
+  "description": "Maps all bounded contexts in a repository or workspace to their CONTEXT.md locations. Used by agents to navigate domain language in monorepos and multi-repo workspaces.",
+  "type": "object",
+  "required": ["version", "contexts"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["2.0"]
+    },
+    "workspace": {
+      "type": "object",
+      "description": "Workspace-level metadata (for multi-repo setups)",
+      "properties": {
+        "name": { "type": "string" },
+        "architecture_style": {
+          "type": "string",
+          "examples": [
+            "microservices",
+            "monolith",
+            "modular-monolith",
+            "event-driven"
+          ]
+        },
+        "shared_patterns": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "primary_context": {
+      "type": "string",
+      "description": "ID of the primary bounded context for single-context repos"
+    },
+    "contexts": {
+      "type": "array",
+      "description": "All bounded contexts in scope",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "path"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique context identifier (kebab-case)",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable context name (e.g. 'Payments', 'Customer', 'Insurance Policy')"
+          },
+          "path": {
+            "type": "string",
+            "description": "Path to CONTEXT.md relative to repo root"
+          },
+          "description": {
+            "type": "string",
+            "description": "One-line description of this bounded context's responsibility"
+          },
+          "owner_team": {
+            "type": "string",
+            "description": "Team or squad responsible for this context"
+          },
+          "dependencies": {
+            "type": "array",
+            "description": "Other context IDs this context depends on",
+            "items": { "type": "string" }
+          },
+          "repository": {
+            "type": "string",
+            "description": "For multi-repo: the repository containing this context"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

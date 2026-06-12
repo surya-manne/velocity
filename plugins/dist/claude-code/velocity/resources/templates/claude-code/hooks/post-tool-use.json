@@ -1,0 +1,31 @@
+{
+  "hooks": [
+    {
+      "event": "PostToolUse",
+      "tool": "Bash",
+      "matcher": {
+        "pattern": "npm install|yarn add|pnpm add|pip install|go get|cargo add"
+      },
+      "action": "notify",
+      "message": "Dependency added. Run /velocity-sync to update Project Intelligence and regenerate skill configs."
+    },
+    {
+      "event": "PostToolUse",
+      "tool": "Write",
+      "matcher": {
+        "pattern": "CONTEXT\\.md"
+      },
+      "action": "notify",
+      "message": "CONTEXT.md modified directly. Consider using /grill-with-docs to produce a proposal instead of direct edits, to preserve the audit trail."
+    },
+    {
+      "event": "PostToolUse",
+      "tool": "Bash",
+      "matcher": {
+        "pattern": "git push"
+      },
+      "action": "notify",
+      "message": "Push complete. Confirm CI is passing and guardrails are green before requesting a review."
+    }
+  ]
+}
