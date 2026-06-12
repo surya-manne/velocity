@@ -17,7 +17,7 @@ on:
 
 jobs:
   check:
-    name: Verify generated bundles are up to date
+    name: Typecheck plugin builder
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     defaults:
@@ -32,18 +32,20 @@ jobs:
           cache-dependency-path: tools/plugin-builder/package-lock.json
       - run: npm ci
       - run: npm run typecheck
-      # Fails if plugins/dist or marketplace manifests are stale.
-      - run: npm run check
 
   build:
     name: Rebuild bundles on release tag
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
     defaults:
       run:
         working-directory: tools/plugin-builder
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -51,11 +53,13 @@ jobs:
           cache-dependency-path: tools/plugin-builder/package-lock.json
       - run: npm ci
       - run: npm run build:plugins
-      - name: Upload plugin bundles
-        uses: actions/upload-artifact@v4
-        with:
-          name: velocity-plugins
-          path: |
-            plugins/dist/**
-            .claude-plugin/marketplace.json
-            .cursor-plugin/marketplace.json
+      - name: Commit and push built plugin bundles
+        working-directory: ${{ github.workspace }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f plugins/dist/
+          git add .claude-plugin/marketplace.json .cursor-plugin/marketplace.json
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "chore: rebuild plugin bundles for ${{ github.ref_name }} [skip ci]"
+          git push origin HEAD:main

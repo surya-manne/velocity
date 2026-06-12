@@ -1,0 +1,28 @@
+# Velocity local install manifest template.
+# Placeholders: {{VELOCITY_VERSION}}, {{GENERATED_AT}}, {{TARGET_ASSISTANTS}}.
+version: "{{VELOCITY_VERSION}}"
+install_method: local
+generated_at: "{{GENERATED_AT}}"
+target_assistants: "{{TARGET_ASSISTANTS}}"
+files:
+  - path: README.md
+    purpose: Copy instructions for client repositories.
+  - path: velocity-init.md
+    purpose: Native assistant bootstrap entry file.
+  - path: velocity-sync.md
+    purpose: Optional delta regeneration entry file.
+  - path: velocity-validate.md
+    purpose: Optional validation entry file.
+copy_targets:
+  vscode_copilot:
+    init: .github/prompts/velocity-init.prompt.md
+    sync: .github/prompts/velocity-sync.prompt.md
+    validate: .github/prompts/velocity-validate.prompt.md
+  cursor:
+    init: .cursor/skills/velocity-init.md
+    sync: .cursor/skills/velocity-sync.md
+    validate: .cursor/skills/velocity-validate.md
+  claude_code:
+    init: commands/velocity-init.md
+    sync: commands/velocity-sync.md
+    validate: commands/velocity-validate.md

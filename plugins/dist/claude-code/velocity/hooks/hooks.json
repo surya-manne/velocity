@@ -1,0 +1,30 @@
+[
+  {
+    "event": "PreToolUse",
+    "tool": "Bash",
+    "matcher": "git push --force(?! *--force-with-lease)",
+    "action": "block",
+    "message": "Force push blocked. Use --force-with-lease."
+  },
+  {
+    "event": "PreToolUse",
+    "tool": "Bash",
+    "matcher": "git reset --hard",
+    "action": "block",
+    "message": "Hard reset blocked. Stash or commit first."
+  },
+  {
+    "event": "PreToolUse",
+    "tool": "WriteFile",
+    "matcher": "\\.(env|pem|key|p12|pfx|secret)$",
+    "action": "warn",
+    "message": "Writing a secrets file. Confirm this file will NOT be committed to version control."
+  },
+  {
+    "event": "PreToolUse",
+    "tool": "WriteFile",
+    "matcher": "skills/.+/SKILL\\.md|agents/.+\\.md|schemas/.+\\.json",
+    "action": "warn",
+    "message": "Modifying a Velocity platform file. Ensure changes follow the canonical skill/agent/schema format and are covered by a RALPH annotation after the session."
+  }
+]

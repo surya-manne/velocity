@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://velocity.dev/schemas/skill.schema.json",
+  "title": "SkillDefinition",
+  "description": "A Velocity skill — a scoped, reusable prompt chain invoked on demand",
+  "type": "object",
+  "required": ["id", "name", "description", "category"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique skill identifier (kebab-case)",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name (used as command name: /name)"
+    },
+    "description": {
+      "type": "string",
+      "description": "One-line description of what this skill does and when to invoke it"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "infrastructure",
+        "planning",
+        "engineering",
+        "handoff",
+        "governance",
+        "vertical-slice",
+        "ralph"
+      ],
+      "description": "Skill category for organization and discovery"
+    },
+    "chain_position": {
+      "type": "string",
+      "enum": [
+        "discovery",
+        "planning",
+        "decomposition",
+        "implementation",
+        "review",
+        "maintenance",
+        "utility"
+      ],
+      "description": "Position in the canonical skill chain"
+    },
+    "context_load": {
+      "type": "array",
+      "description": "Files to read at skill invocation time (Layer 2 context loading)",
+      "items": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path relative to repo root or .velocity/"
+          },
+          "required": { "type": "boolean", "default": true },
+          "injection_tier": {
+            "type": "string",
+            "enum": ["title-only", "summary", "full"],
+            "default": "full"
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "description": "Where this skill writes its output",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Output path pattern (may use {id}, {date} tokens)"
+        },
+        "format": { "type": "string", "enum": ["markdown", "yaml", "json"] }
+      }
+    },
+    "stack_variants": {
+      "type": "object",
+      "description": "Stack-specific customisations applied by Skill Factory",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "additional_context": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "prompt_suffix": { "type": "string" }
+        }
+      }
+    },
+    "preconditions": {
+      "type": "array",
+      "description": "Skills or artifacts that must exist before this skill can run",
+      "items": { "type": "string" }
+    },
+    "next_skills": {
+      "type": "array",
+      "description": "Suggested next skills after this one completes",
+      "items": { "type": "string" }
+    },
+    "fresh_context_window": {
+      "type": "boolean",
+      "description": "This skill should run in a fresh context window (enforced by context_window_reset_between_slices guardrail)",
+      "default": false
+    },
+    "skill_md_path": {
+      "type": "string",
+      "description": "Path to the SKILL.md source template in the Velocity repo"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "complete", "stable", "deprecated"],
+      "default": "complete",
+      "description": "Skill implementation status. draft=work in progress; complete=fully authored and usable; stable=battle-tested with RALPH annotations; deprecated=superseded, do not use"
+    },
+    "deprecated_by": {
+      "type": "string",
+      "description": "ID of the skill that supersedes this one (required when status=deprecated)"
+    }
+  },
+  "additionalProperties": false
+}

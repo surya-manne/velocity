@@ -1,0 +1,220 @@
+# Velocity SDLC Pipeline Definitions
+# Schema: schemas/pipeline.schema.json
+# Instantiated into .velocity/sdlc/pipeline.yaml by pipeline-init
+# Override per-project via pipeline-config.yaml (not this file)
+
+id: default
+version: 1.0.0
+description: >-
+  Default Velocity SDLC pipeline definitions for all four work-type variants.
+  Phase sequences follow plan-ai-sdlc-addendum.md §2a–2d.
+
+# ── Phase Catalogue ──────────────────────────────────────────────────────────
+phases:
+
+  # Shared phases
+  build:
+    id: build
+    name: Build
+    owning_agent: engineer
+    key_skills: [tdd]
+    exit_artifact: Tests passing, guardrails green
+    gate_type: automated
+    skippable: false
+    artifact_dir: tasks
+
+  validate:
+    id: validate
+    name: Validate
+    owning_agent: qa
+    key_skills: [validate, test-strategy]
+    exit_artifact: Test report
+    gate_type: human
+    skippable: true
+    artifact_dir: tasks
+
+  review:
+    id: review
+    name: Review
+    owning_agent: reviewer
+    key_skills: [validate]
+    exit_artifact: PR ready
+    gate_type: human
+    skippable: false
+    artifact_dir: handoffs
+
+  release:
+    id: release
+    name: Release
+    owning_agent: engineer
+    key_skills: [handoff]
+    exit_artifact: Handoff artifact
+    gate_type: human
+    skippable: false
+    artifact_dir: handoffs
+
+  # New Feature phases
+  discovery:
+    id: discovery
+    name: Discovery
+    owning_agent: product
+    key_skills: [grill-with-docs, domain-model]
+    exit_artifact: CONTEXT.md updated, ADRs recorded
+    gate_type: human
+    skippable: true
+    artifact_dir: context
+
+  design:
+    id: design
+    name: Design
+    owning_agent: architect
+    key_skills: [architecture-doc, api-design, security-design]
+    exit_artifact: Architecture document
+    gate_type: human
+    skippable: true
+    artifact_dir: architecture
+
+  planning:
+    id: planning
+    name: Planning
+    owning_agent: planner
+    key_skills: [to-prd, to-features, to-tasks]
+    exit_artifact: Feature board and task list
+    gate_type: human
+    skippable: false
+    artifact_dir: tasks
+
+  # Bug Fix phases
+  reproduce:
+    id: reproduce
+    name: Reproduce
+    owning_agent: debugger
+    key_skills: []
+    exit_artifact: Reproduction test (failing)
+    gate_type: human
+    skippable: true
+    artifact_dir: tasks
+
+  root-cause:
+    id: root-cause
+    name: Root Cause
+    owning_agent: debugger
+    key_skills: [adr-engine]
+    exit_artifact: Root cause document
+    gate_type: human
+    skippable: false
+    artifact_dir: architecture
+
+  fix:
+    id: fix
+    name: Fix
+    owning_agent: engineer
+    key_skills: [tdd]
+    exit_artifact: Tests passing, no regression
+    gate_type: automated
+    skippable: false
+    artifact_dir: tasks
+
+  # Extend phases
+  context-load:
+    id: context-load
+    name: Context Load
+    owning_agent: researcher
+    key_skills: []
+    exit_artifact: Context brief
+    gate_type: human
+    skippable: false
+    artifact_dir: context
+
+  impact-analysis:
+    id: impact-analysis
+    name: Impact Analysis
+    owning_agent: architect
+    key_skills: [improve-codebase-architecture]
+    exit_artifact: Impact document
+    gate_type: human
+    skippable: true
+    artifact_dir: impact
+
+  design-delta:
+    id: design-delta
+    name: Design Delta
+    owning_agent: architect
+    key_skills: [api-design, architecture-doc]
+    exit_artifact: Delta ADR (if required)
+    gate_type: human
+    skippable: true
+    artifact_dir: architecture
+
+  # Refactor phases
+  analysis:
+    id: analysis
+    name: Analysis
+    owning_agent: refactor
+    key_skills: [improve-codebase-architecture]
+    exit_artifact: Refactor candidates list
+    gate_type: human
+    skippable: false
+    artifact_dir: refactor-proposals
+
+  proposal:
+    id: proposal
+    name: Proposal
+    owning_agent: architect
+    key_skills: [architecture-doc]
+    exit_artifact: Refactor plan
+    gate_type: human
+    skippable: false
+    artifact_dir: refactor-proposals
+
+  validate-proposal:
+    id: validate-proposal
+    name: Validate Proposal
+    owning_agent: reviewer
+    key_skills: [validate]
+    exit_artifact: Review notes
+    gate_type: human
+    skippable: false
+    artifact_dir: refactor-proposals
+
+# ── Pipeline Variants ─────────────────────────────────────────────────────────
+pipeline_variants:
+
+  # §2a — New Feature
+  new-feature:
+    - discovery
+    - design
+    - planning
+    - build
+    - validate
+    - review
+    - release
+
+  # §2b — Bug Fix
+  bug-fix:
+    - reproduce
+    - root-cause
+    - fix
+    - validate
+    - review
+    - release
+
+  # §2c — Extend Existing Feature
+  extend:
+    - context-load
+    - impact-analysis
+    - design-delta
+    - build
+    - validate
+    - review
+    - release
+
+  # §2d — Refactor
+  refactor:
+    - analysis
+    - proposal
+    - validate-proposal
+    - build
+    - validate
+    - review
+    - release

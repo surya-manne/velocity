@@ -1,0 +1,320 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://velocity.dev/schemas/marketplace-pack.schema.json",
+  "title": "MarketplacePack",
+  "description": "Velocity Marketplace pack manifest (pack.md). Defines a versioned, distributable bundle of agents, skills, workflows, guardrails, or domain knowledge.",
+  "type": "object",
+  "required": ["id", "name", "version", "type", "description", "author"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$",
+      "description": "Globally unique pack identifier. Use kebab-case. Must be unique in the registry."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable pack name."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-(alpha|beta|rc)(\\.(0|[1-9]\\d*))?)?$",
+      "description": "Semantic version string (major.minor.patch[-alpha|beta|rc.N])."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "domain",
+        "skill",
+        "agent",
+        "workflow",
+        "guardrail",
+        "context-template"
+      ],
+      "description": "Pack type. Determines how contents are installed and activated."
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description of what this pack provides (1–3 sentences)."
+    },
+    "author": {
+      "$ref": "#/definitions/Author"
+    },
+    "license": {
+      "type": "string",
+      "default": "MIT",
+      "description": "SPDX license identifier (e.g. MIT, Apache-2.0, CC-BY-4.0)."
+    },
+    "velocity_version_min": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "description": "Minimum Velocity version required to install this pack (major.minor).",
+      "default": "2.0"
+    },
+    "velocity_version_max": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$",
+      "description": "Maximum Velocity version compatible with this pack. Omit if no upper bound."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Searchable tags (domain, technology, industry, pattern)."
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "description": "Pack homepage URL (GitHub repo, docs site, etc.)."
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri",
+      "description": "Source repository URL."
+    },
+    "changelog": {
+      "type": "string",
+      "description": "Path to CHANGELOG.md within the pack, or a URL."
+    },
+    "dependencies": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Dependency" },
+      "description": "Other Velocity packs this pack depends on. Installed automatically."
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      },
+      "description": "Packs that conflict with this one. Installation blocked if any are active."
+    },
+    "signals": {
+      "$ref": "#/definitions/Signals",
+      "description": "Detection signals used by Project Intelligence to auto-recommend this pack."
+    },
+    "contents": {
+      "$ref": "#/definitions/Contents",
+      "description": "What is included in this pack."
+    },
+    "install": {
+      "$ref": "#/definitions/InstallConfig",
+      "description": "Installation behaviour overrides."
+    }
+  },
+  "definitions": {
+    "Author": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "url": { "type": "string", "format": "uri" },
+        "verified": {
+          "type": "boolean",
+          "description": "True if this is an official Velocity-maintained pack."
+        }
+      }
+    },
+    "Dependency": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Pack ID of the dependency."
+        },
+        "version": {
+          "type": "string",
+          "description": "SemVer range string (e.g. '>=1.0.0', '^2.1.0', '1.x')."
+        },
+        "optional": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, installation continues even if this dependency cannot be resolved."
+        }
+      }
+    },
+    "Signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Project Intelligence signals that trigger an auto-recommendation for this pack.",
+      "properties": {
+        "file_patterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Glob patterns. If any match, recommend this pack."
+        },
+        "import_patterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Source code import/require strings. Matched against all source files."
+        },
+        "context_md_terms": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "CONTEXT.md terms that indicate this domain is active."
+        },
+        "stack": {
+          "type": "object",
+          "description": "Stack.md field matches that trigger recommendation.",
+          "additionalProperties": { "type": "string" }
+        },
+        "dependency_names": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Package names in package.json / pom.xml / requirements.txt etc. that indicate this pack is relevant."
+        }
+      }
+    },
+    "Contents": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Files and capabilities included in this pack.",
+      "properties": {
+        "context_template": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to the CONTEXT.md template within the pack."
+            },
+            "bounded_context": {
+              "type": "string",
+              "description": "Which bounded context this CONTEXT.md seeds."
+            },
+            "merge_strategy": {
+              "type": "string",
+              "enum": ["append", "replace-if-empty", "propose"],
+              "default": "propose",
+              "description": "How to apply this template when a CONTEXT.md already exists. 'propose' writes a context-proposal instead of overwriting."
+            }
+          }
+        },
+        "skills": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/PackSkill" },
+          "description": "SKILL.md files included in this pack."
+        },
+        "agents": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/PackAgent" },
+          "description": "Agent definitions included in this pack."
+        },
+        "workflows": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/PackWorkflow" },
+          "description": "Workflow prompt sequences included in this pack."
+        },
+        "guardrails": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to the guardrails YAML file within the pack."
+            },
+            "merge_strategy": {
+              "type": "string",
+              "enum": ["append", "replace"],
+              "default": "append",
+              "description": "How to merge pack guardrails with existing .velocity/guardrails/."
+            }
+          }
+        },
+        "grill_seeds": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Domain-specific question seeds injected into grill-with-docs and grill-me when this pack is active.",
+          "properties": {
+            "product": { "type": "array", "items": { "type": "string" } },
+            "architecture": { "type": "array", "items": { "type": "string" } },
+            "security": { "type": "array", "items": { "type": "string" } },
+            "performance": { "type": "array", "items": { "type": "string" } },
+            "vertical_slice": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "PackSkill": {
+      "type": "object",
+      "required": ["id", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "path": {
+          "type": "string",
+          "description": "Path to SKILL.md within the pack."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["engineering", "planning", "governance", "domain", "handoff"]
+        },
+        "replaces": {
+          "type": "string",
+          "description": "ID of a built-in Velocity skill this pack skill overrides."
+        }
+      }
+    },
+    "PackAgent": {
+      "type": "object",
+      "required": ["id", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "path": {
+          "type": "string",
+          "description": "Path to agent YAML within the pack."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["domain-specialist", "subagent", "cognitive"],
+          "description": "How this agent integrates with the Velocity agent hierarchy."
+        }
+      }
+    },
+    "PackWorkflow": {
+      "type": "object",
+      "required": ["id", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "path": {
+          "type": "string",
+          "description": "Path to workflow prompt template within the pack."
+        }
+      }
+    },
+    "InstallConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "destination": {
+          "type": "string",
+          "default": ".velocity/marketplace/installed/{pack-id}/",
+          "description": "Override the default installation destination directory."
+        },
+        "post_install_skill": {
+          "type": "string",
+          "description": "Skill ID to invoke automatically after installation (e.g. to seed CONTEXT.md)."
+        },
+        "requires_regeneration": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, the marketplace skill triggers adapter regeneration after install."
+        }
+      }
+    }
+  }
+}

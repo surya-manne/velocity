@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://velocity.dev/schemas/rule-pack.schema.json",
+  "title": "RulePackManifest",
+  "description": "Velocity rule-packs.md — declares which external rule and standards packs to import",
+  "type": "object",
+  "required": ["version", "packs"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["2.0"],
+      "description": "Velocity schema version"
+    },
+    "packs": {
+      "type": "array",
+      "description": "List of rule packs to import",
+      "items": {
+        "$ref": "#/definitions/PackEntry"
+      }
+    }
+  },
+  "definitions": {
+    "PackEntry": {
+      "type": "object",
+      "required": ["id", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$",
+          "description": "Unique identifier for this pack entry within the manifest"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "agent-rules-books",
+            "cursor-rules-community",
+            "claude-instructions",
+            "copilot-instructions",
+            "local",
+            "velocity-domain-pack"
+          ],
+          "description": "Source type. Determines how rules are fetched"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Set false to disable this pack without removing the entry"
+        },
+        "packs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of pack names to import from this source. For source: local, omit this field (all files in path are read)"
+        },
+        "path": {
+          "type": "string",
+          "description": "Local filesystem path to read rules from. Required when source is 'local'"
+        },
+        "ref": {
+          "type": "string",
+          "description": "Override the default source repository URL. Useful for private forks or mirrors"
+        },
+        "overrides": {
+          "$ref": "#/definitions/PackOverrides",
+          "description": "Pack-level configuration overrides"
+        }
+      },
+      "if": {
+        "properties": { "source": { "const": "local" } }
+      },
+      "then": {
+        "required": ["id", "source", "path"]
+      }
+    },
+    "PackOverrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Per-pack overrides applied during normalization and conversion",
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": ["block", "warn", "info"],
+          "description": "Downgrade all rules in this pack to the specified severity. Useful for third-party packs that are too strict for your team"
+        },
+        "skip_classifications": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["skill", "guardrail", "context-standard", "always-on"]
+          },
+          "description": "Skip rules of the specified classification types from this pack"
+        },
+        "tag_filter": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Import only rules matching at least one of these tags. If empty, all rules are imported"
+        },
+        "exclude_rule_ids": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicit list of rule IDs to skip from this pack"
+        }
+      }
+    }
+  }
+}
