@@ -2,6 +2,17 @@
 
 The Claude Code adapter generates native Claude Code assets: the always-on `CLAUDE.md`, subagent definitions, command files, and hook scripts.
 
+::: tip Install as a plugin
+To install Velocity directly via Claude Code's plugin manager:
+
+```text
+/plugin marketplace add https://github.com/surya-manne/velocity
+/plugin install velocity
+```
+
+Then run `/velocity-init`. See [Installable Plugins](/adapters/plugins). The adapter below describes the per-repo files `init`/`sync` generate inside an initialized project.
+:::
+
 ## Generated Files
 
 ```

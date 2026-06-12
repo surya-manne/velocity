@@ -2,6 +2,10 @@
 
 The GitHub Copilot adapter generates native Copilot assets for VS Code and JetBrains: the always-on instructions file, the agents manifest, and prompt files for each skill.
 
+::: tip Install as a plugin
+Open the Agent Customizations panel in the Chat sidebar, go to Plugins → Install Plugin from Source, enter `https://github.com/surya-manne/velocity`, then run `#velocity-init`. See [Installable Plugins](/adapters/plugins). The adapter below describes the per-repo files `init`/`sync` generate inside an initialized project.
+:::
+
 ## Generated Files
 
 ```

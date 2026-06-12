@@ -1,0 +1,84 @@
+# Unified authoring manifest for the Velocity multi-platform plugins.
+#
+# This is the SINGLE source that the publish-time generator (tools/plugin-builder)
+# reads to emit three self-contained native plugin bundles:
+#   - Claude Code  -> plugins/dist/claude-code/velocity
+#   - Cursor       -> plugins/dist/cursor/velocity
+#   - Copilot      -> plugins/dist/copilot/velocity
+#
+# Canonical skills/agents/templates/schemas are discovered from the repo; this
+# file only declares metadata, what to include/exclude, and per-target options.
+# Never hand-edit plugins/dist/ — edit the canonical sources and rebuild.
+
+name: velocity
+version: 1.0.0
+description: >-
+  Velocity AI acceleration layer — project intelligence, domain context, agent
+  roles, the SDLC skill chain, and runtime guardrails. Run /velocity-init to set
+  up project context and intelligence in any repository.
+author:
+  name: Surya Manne
+license: MIT
+homepage: https://github.com/surya-manne/velocity#readme
+repository: https://github.com/surya-manne/velocity
+keywords:
+  - ai
+  - agents
+  - skills
+  - guardrails
+  - sdlc
+  - velocity
+
+# Canonical source locations (relative to repo root).
+sources:
+  skills: skills
+  agents: agents
+  subagents: agents/subagents
+  templates: templates
+  schemas: schemas
+  hooks: hooks.json
+
+# Skills NOT shipped as plugin commands. These are either parent index docs or
+# install paths made redundant by the native plugin install flow.
+exclude_skills:
+  - ralph # parent index; real skills live under ralph/annotate, ralph/learn
+  - local-installer # superseded by native plugin install
+  - plugin-installer # superseded by native plugin install
+  - marketplace # platform-internal registry skill
+
+# Override a command name when it must differ from the skill's frontmatter `name`.
+# (By default the builder uses the skill's `name`, falling back to its directory.)
+command_overrides: {}
+
+# Commands surfaced prominently in always-on rules / instructions (the SDLC chain).
+# Names are platform-neutral; the builder prefixes them per target (/name or #name).
+featured_commands:
+  - velocity-init
+  - grill-with-docs
+  - domain-model
+  - to-prd
+  - to-features
+  - to-tasks
+  - tdd
+  - validate
+  - handoff
+  - sync
+
+# The init/sync skills that read bundled templates/schemas. The builder rewrites
+# their repo-relative path references to the bundle's resources/ root.
+resource_consuming_skills:
+  - velocity-init
+  - sync
+  - init
+
+# Per-target output configuration.
+targets:
+  claude-code:
+    enabled: true
+    dist: plugins/dist/claude-code/velocity
+  cursor:
+    enabled: true
+    dist: plugins/dist/cursor/velocity
+  copilot:
+    enabled: true
+    dist: plugins/dist/copilot/velocity

@@ -119,13 +119,7 @@ This means Velocity isn't tied to any one AI tool. Any assistant that reads the 
    - Detect your tech stack
    - Create `.velocity/` with agent definitions, skill adapters, and guardrail hooks
    - Write `docs/ARCHITECTURE.md` and `docs/TECHSTACK.md`
-   - Create a context file for your AI tool:
-
-     | AI Tool | File |
-     |---------|------|
-     | GitHub Copilot | `.github/copilot-instructions.md` |
-     | Cursor | `.cursor/rules/velocity.mdc` |
-     | Claude Code | `CLAUDE.md` |
+   - Create the right context files for VS Code or Cursor
 
 ### Step 2 — Use skills and agents
 

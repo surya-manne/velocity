@@ -1,0 +1,19 @@
+{
+  "name": "velocity",
+  "plugins": [
+    {
+      "name": "velocity",
+      "source": "./plugins/dist/cursor/velocity",
+      "description": "Velocity AI acceleration layer — project intelligence, domain context, agent roles, the SDLC skill chain, and runtime guardrails. Run /velocity-init to set up project context and intelligence in any repository.",
+      "keywords": [
+        "ai",
+        "agents",
+        "skills",
+        "guardrails",
+        "sdlc",
+        "velocity"
+      ],
+      "category": "Productivity"
+    }
+  ]
+}

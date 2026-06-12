@@ -8,9 +8,9 @@
 
 ## Active Decisions
 
-| ID                                                      | Title | Date | Bounded Context | Status | Path |
-| ------------------------------------------------------- | ----- | ---- | --------------- | ------ | ---- |
-| _(No ADRs yet — generated during development sessions)_ |       |      |                 |        |      |
+| ID       | Title                               | Date       | Bounded Context   | Status   | Path                                                                     |
+| -------- | ----------------------------------- | ---------- | ----------------- | -------- | ------------------------------------------------------------------------ |
+| ADR-0001 | Publish-time plugin build generator | 2026-06-12 | velocity-platform | Accepted | [ADR-0001-plugin-build-generator.md](ADR-0001-plugin-build-generator.md) |
 
 ---
 

@@ -2,6 +2,10 @@
 
 The Cursor adapter generates all native Cursor assets from your `.velocity/` configuration: the always-on rules file, agent system prompts, skill definitions, and hooks.
 
+::: tip Install as a plugin
+Open the Agent Customizations panel in the Chat sidebar, go to Plugins → Install Plugin from Source, enter `https://github.com/surya-manne/velocity`, then run `/velocity-init`. See [Installable Plugins](/adapters/plugins). The adapter below describes the per-repo files `init`/`sync` generate inside an initialized project.
+:::
+
 ## Generated Files
 
 After running the Cursor adapter:
