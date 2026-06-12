@@ -3,7 +3,7 @@
   "metadata": {
     "description": "Velocity AI acceleration layer — project intelligence, domain context, agent roles, the SDLC skill chain, and runtime guardrails.",
     "version": "1.0.0",
-    "pluginRoot": "./plugins/dist/claude-code"
+    "pluginRoot": "./plugins/dist/copilot"
   },
   "owner": {
     "name": "Surya Manne",
