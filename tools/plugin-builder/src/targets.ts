@@ -155,11 +155,12 @@ export function buildCopilot(ctx: BuildContext, dist: string): void {
   resetDir(dist);
 
   const gh = join(dist, ".github");
+  const instructions = copilotInstructionsFile(cfg);
   write(join(gh, "copilot-instructions.md"), copilotInstructions(cfg));
-  write(
-    join(gh, "instructions", "velocity.instructions.md"),
-    copilotInstructionsFile(cfg),
-  );
+  write(join(gh, "instructions", "velocity.instructions.md"), instructions);
+  // Also write instructions at plugin root so VS Code plugin manager picks them
+  // up natively without requiring chat.promptFiles to be set by the user.
+  write(join(dist, "instructions", "velocity.instructions.md"), instructions);
 
   for (const skill of skills) {
     const full = skillContent(skill, "copilot", repo);
@@ -171,7 +172,10 @@ export function buildCopilot(ctx: BuildContext, dist: string): void {
       "",
       stripLeadingFrontmatter(full),
     ].join("\n");
+    // Write under .github/ for workspace-copy install (install.sh / manual).
     write(join(gh, "prompts", `${skill.command}.prompt.md`), prompt);
+    // Write at plugin root so VS Code plugin manager serves #skill-name natively.
+    write(join(dist, "prompts", `${skill.command}.prompt.md`), prompt);
     // Native Copilot skills keep their own frontmatter.
     write(join(gh, "skills", skill.dir, "SKILL.md"), full);
   }
@@ -185,7 +189,10 @@ export function buildCopilot(ctx: BuildContext, dist: string): void {
       "",
       subagentBody(agent),
     ].join("\n");
+    // Write under .github/ for workspace-copy install.
     write(join(gh, "agents", `${agent.id}.agent.md`), file);
+    // Write at plugin root for native plugin manager.
+    write(join(dist, "agents", `${agent.id}.agent.md`), file);
   }
 
   // Copilot prompts are self-contained, but init/sync still reference templates/
