@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: vscode-extension
+        working-directory: packages/vscode-extension
 
     steps:
       - uses: actions/checkout@v4
@@ -20,18 +20,18 @@ jobs:
         run: |
           mkdir -p skills/init skills/sync skills/validate
           mkdir -p templates/local-install
-          cp ../skills/init/SKILL.md      skills/init/SKILL.md
-          cp ../skills/sync/SKILL.md      skills/sync/SKILL.md
-          cp ../skills/validate/SKILL.md  skills/validate/SKILL.md
-          cp ../templates/local-install/README.md   templates/local-install/README.md
-          cp ../templates/local-install/manifest.yml templates/local-install/manifest.yml
-        working-directory: vscode-extension
+          cp ../../core/skills/init/SKILL.md      skills/init/SKILL.md
+          cp ../../core/skills/sync/SKILL.md      skills/sync/SKILL.md
+          cp ../../core/skills/validate/SKILL.md  skills/validate/SKILL.md
+          cp ../../core/templates/local-install/README.md   templates/local-install/README.md
+          cp ../../core/templates/local-install/manifest.yml templates/local-install/manifest.yml
+        working-directory: packages/vscode-extension
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: vscode-extension/package-lock.json
+          cache-dependency-path: packages/vscode-extension/package-lock.json
 
       - run: npm ci
 

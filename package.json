@@ -1,0 +1,25 @@
+{
+  "name": "velocity",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Acceleration Layer for AI Coding Assistants",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/surya-manne/velocity"
+  },
+  "workspaces": [
+    "packages/*",
+    "docs-site"
+  ],
+  "scripts": {
+    "build:plugins": "npm run build:plugins -w packages/plugin-builder",
+    "build:extension": "npm run build -w packages/vscode-extension",
+    "build:docs": "npm run docs:build -w docs-site",
+    "check:plugins": "npm run check -w packages/plugin-builder",
+    "typecheck": "npm run typecheck -w packages/plugin-builder"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -22,20 +22,21 @@ pnpm-debug.log*
 *.temp
 
 # Build outputs
-docs/.vitepress/dist/
-docs/.vitepress/cache/
-vscode-extension/dist/
-vscode-extension/out/
-docs/node_modules/
+docs-site/.vitepress/dist/
+docs-site/.vitepress/cache/
+packages/vscode-extension/dist/
+packages/vscode-extension/out/
+
+# Plugin bundles (CI-generated)
+plugins/dist/
 
 # Plugin builder temp (staging dir used by `npm run check`)
 .plugin-build-check/
 
 # VS Code extension packages
-vscode-extension/*.vsix
+packages/vscode-extension/*.vsix
 
 # Velocity runtime / temp
-agents/TEMP/
 .velocity/artifacts/ralph/
 .velocity/artifacts/context/
 .velocity/artifacts/handoffs/
@@ -53,7 +54,3 @@ plans/
 .env
 .env.*
 !.env.example
-
-plan-v2.md
-plan.md
-plan-ai-sdlc-addendum.md

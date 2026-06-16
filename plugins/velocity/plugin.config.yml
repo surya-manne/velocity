@@ -1,6 +1,6 @@
 # Unified authoring manifest for the Velocity multi-platform plugins.
 #
-# This is the SINGLE source that the publish-time generator (tools/plugin-builder)
+# This is the SINGLE source that the publish-time generator (packages/plugin-builder)
 # reads to emit three self-contained native plugin bundles:
 #   - Claude Code  -> plugins/dist/claude-code/velocity
 #   - Cursor       -> plugins/dist/cursor/velocity
@@ -31,12 +31,12 @@ keywords:
 
 # Canonical source locations (relative to repo root).
 sources:
-  skills: skills
-  agents: agents
-  subagents: agents/subagents
-  templates: templates
-  schemas: schemas
-  hooks: hooks.json
+  skills: core/skills
+  agents: core/agents
+  subagents: core/agents/subagents
+  templates: core/templates
+  schemas: core/schemas
+  hooks: core/hooks.json
 
 # Skills NOT shipped as plugin commands. These are either parent index docs or
 # install paths made redundant by the native plugin install flow.

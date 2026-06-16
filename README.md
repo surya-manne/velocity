@@ -50,3 +50,30 @@ After installing, run `/velocity-init` (or `#velocity:init` in Copilot) in your 
 ## Docs
 
 Full documentation: **<https://surya-manne.github.io/velocity/>**
+
+---
+
+## Repository Structure
+
+```
+velocity/
+├── core/                # Product content: skills, agents, templates, schemas
+├── packages/
+│   ├── plugin-builder/  # Generates plugin bundles for all 3 assistants
+│   └── vscode-extension/ # VS Code Marketplace extension
+├── docs-site/           # VitePress documentation site
+├── plugins/             # Plugin authoring configuration
+└── schemas/             # JSON schemas (inside core/)
+```
+
+## Development
+
+```bash
+npm install                # Install all workspace dependencies
+npm run build:plugins      # Build plugin bundles
+npm run build:extension    # Build VS Code extension
+npm run build:docs         # Build documentation site
+npm run typecheck          # Typecheck plugin builder
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.

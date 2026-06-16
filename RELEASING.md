@@ -8,7 +8,7 @@ Velocity ships as three native, installable plugins generated from one unified s
 | Cursor          | `plugins/dist/cursor/velocity/`      | Cursor Marketplace (submitted for review) + local install |
 | VS Code Copilot | `plugins/dist/copilot/velocity/`     | `.github/` bundle via git / template repo                 |
 
-The single source of truth is the canonical `skills/`, `agents/`, `templates/`, `schemas/`, and `hooks.json`, plus the authoring manifest [`plugins/velocity/plugin.config.yml`](plugins/velocity/plugin.config.yml). The generator lives in [`tools/plugin-builder/`](tools/plugin-builder). See [ADR-0001](.velocity/knowledge-base/adrs/ADR-0001-plugin-build-generator.md) for the rationale.
+The single source of truth is the canonical `core/skills/`, `core/agents/`, `core/templates/`, `core/schemas/`, and `core/hooks.json`, plus the authoring manifest [`plugins/velocity/plugin.config.yml`](plugins/velocity/plugin.config.yml). The generator lives in [`packages/plugin-builder/`](packages/plugin-builder). See [ADR-0001](.velocity/knowledge-base/adrs/ADR-0001-plugin-build-generator.md) for the rationale.
 
 > Never hand-edit `plugins/dist/` or the root `marketplace.json` files. Edit the canonical sources or `plugin.config.yml` and rebuild.
 
@@ -17,8 +17,14 @@ The single source of truth is the canonical `skills/`, `agents/`, `templates/`, 
 ## 1. Build
 
 ```bash
-cd tools/plugin-builder
+cd packages/plugin-builder
 npm install          # first time only
+npm run build:plugins
+```
+
+Or from the repo root:
+
+```bash
 npm run build:plugins
 ```
 
@@ -31,17 +37,23 @@ To change the version or metadata, edit `plugin.config.yml` (`version`, `author`
 ## 2. Verify
 
 ```bash
-cd tools/plugin-builder
+cd packages/plugin-builder
 npm run typecheck     # tsc --noEmit
-npm run check         # build to a temp dir, validate, fail if plugins/dist is stale
+npm run check         # build to a temp dir, validate output
+```
+
+Or from the repo root:
+
+```bash
+npm run typecheck
+npm run check:plugins
 ```
 
 `npm run check` is what CI runs ([.github/workflows/build-plugins.yml](.github/workflows/build-plugins.yml)). It enforces:
 
 - valid JSON manifests,
 - non-empty bundled `resources/` (templates + schemas),
-- every featured command has a generated file,
-- the committed `plugins/dist/` matches a fresh build (no stale output).
+- every featured command has a generated file.
 
 Optional manifest sanity check:
 
@@ -104,7 +116,7 @@ Run `#velocity:init` in Copilot Chat. No VS Code settings changes required — t
 The marketplace _is_ this git repo (`.claude-plugin/marketplace.json` at root). Publishing = pushing.
 
 ```bash
-git add plugins/ .claude-plugin/ .cursor-plugin/ tools/ docs/ README.md RELEASING.md .gitignore .velocity/
+git add core/ plugins/velocity/ packages/ .claude-plugin/ .cursor-plugin/ README.md RELEASING.md .gitignore .velocity/
 git commit -m "feat: native multi-platform plugins (vX.Y.Z)"
 git push
 git tag vX.Y.Z && git push --tags   # CI rebuilds + uploads artifacts
@@ -135,10 +147,10 @@ No marketplace exists. Distribute the `.github/` bundle via git:
 ## Release checklist
 
 1. Bump `version` in [`plugins/velocity/plugin.config.yml`](plugins/velocity/plugin.config.yml).
-2. `cd tools/plugin-builder && npm run build:plugins && npm run typecheck && npm run check`.
+2. From repo root: `npm run build:plugins && npm run typecheck && npm run check:plugins`.
 3. Local-test all three targets (§3).
-4. Commit regenerated `plugins/dist/` + root manifests, push.
-5. Tag `vX.Y.Z` (triggers the build workflow).
+4. Commit changes, push.
+5. Tag `vX.Y.Z` (triggers the build workflow which generates bundles as release artifacts).
 6. Claude Code: done on push. Cursor: submit/resubmit for review. Copilot: update the template repo.
 
 > All install URLs derive from `plugin.config.yml` (`repository` / `homepage`). If the public repo differs from `https://github.com/surya-manne/velocity`, update the manifest and rebuild so the generated manifests, READMEs, and docs point to the right place.
