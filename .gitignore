@@ -33,6 +33,12 @@ plugins/dist/
 # Plugin builder temp (staging dir used by `npm run check`)
 .plugin-build-check/
 
+# Root and docs-site lockfiles are platform-specific (rollup native modules).
+# packages/plugin-builder and packages/vscode-extension lockfiles ARE committed
+# because their CI workflows use `npm ci` and don't have native module issues.
+package-lock.json
+docs-site/package-lock.json
+
 # VS Code extension packages
 packages/vscode-extension/*.vsix
 
