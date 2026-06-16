@@ -31,13 +31,13 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: docs-site/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: cd docs-site && npm ci
+        run: npm ci
 
       - name: Build docs
-        run: cd docs-site && npm run docs:build
+        run: npm run build:docs
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
