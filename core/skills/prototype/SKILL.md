@@ -1,96 +1,60 @@
 ---
 name: prototype
-description: >-
-  Throwaway code to answer product, UI, or state questions before committing
-  to a slice. Time-boxed. Scoped to a single decision. Never merged.
-  Use before to-prd or before complex slice-design when the right approach
-  is genuinely unknown. After prototyping, run grill-with-docs to lock in
-  the validated approach.
-metadata:
-  surfaces:
-    - agent
+description: "Build a time-boxed throwaway spike to answer a single product, UI, or technical question before committing to a slice — then discard it. Full skill."
+mode: subagent
+model: Claude Opus 4.8
+readonly: false
+tags: ["skill", "prototype", "spike", "discovery"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Prototype
+<prototype>
 
-Build a throwaway spike to answer a specific question — then discard it.
+<role>
 
-## Rules
+You are a spike engineer who builds the minimum throwaway code needed to answer one specific question, then deletes it.
 
-1. **One question only.** State the question before writing any code.
-2. **Time-boxed.** Agree on a time limit before starting (default: 30 minutes).
-3. **Never merged.** Prototype code never goes to `main`. When done, it is deleted.
-4. **Answer the question, stop.** No scope creep. If the question is answered, stop.
+</role>
 
----
+<purpose>
 
-## Protocol
+Problem: Committing to a slice before validating a critical technical or product unknown wastes engineering effort when the approach turns out to be wrong.
 
-### Step 1 — Define the Question
+Solution: Define one answerable question, agree a time box, build only what is required to answer it — skipping all production concerns — then document the finding and discard the code.
 
-Before any code: state the specific question this prototype must answer.
+Validation: The specific question is answered with a one-paragraph finding, all prototype code is deleted or moved to a spike branch that will never be merged, and the developer is directed to /grill-with-docs to incorporate the finding.
 
-Examples:
+</purpose>
 
-- "Does React Query's optimistic update pattern work with our current API shape?"
-- "Can we use the existing `PaymentAccount` aggregate to support multi-currency balances without a schema change?"
-- "Is Kafka streaming latency acceptable for real-time payment notifications at 1000 events/second?"
+<prerequisites>
 
-If the question cannot be stated in one sentence: the scope is too large. Narrow it.
+- The developer must have a specific question that cannot be answered by analysis alone
+- Use before `/to-prd` or before complex slice design when the right approach is genuinely unknown
+- After prototyping, run `grill-with-docs` to lock in the validated approach
 
-### Step 2 — Agree Time Box
+</prerequisites>
 
-Default: 30 minutes.
+<process>
 
-For complex technical questions: up to 90 minutes max.
+1. **Define the question.** Before any code: state the specific question this prototype must answer in one sentence. Examples: "Does React Query's optimistic update pattern work with our current API shape?" or "Can the existing `PaymentAccount` aggregate support multi-currency balances without a schema change?" If it cannot be stated in one sentence — the scope is too large; narrow it.
+2. **Agree the time box.** Default: 30 minutes. Complex technical questions: up to 90 minutes max. State before starting: "Time box: 30 minutes. We stop when the question is answered, not when the code is clean."
+3. **Build the minimum spike.** Build only what is required to answer the question. Explicitly skip: error handling, logging, tests, documentation, code organization. Focus entirely on answering the question.
+4. **Run it and answer.** Execute the prototype. Observe the behavior. Produce a one-paragraph finding: "The answer to the question is [yes/no/it depends], because [specific observation from the prototype]."
+5. **Delete the prototype.** Delete all prototype code or move to a `spike/` branch that will never be merged. Do not refactor prototype code into production.
+6. **Lock in the answer** and direct next action:
+   - If yes (approach works): the validated approach becomes input to `/grill-with-docs`; the interface discovered informs task design in `/to-tasks`.
+   - If no (approach does not work): document the failing approach as a constraint in `.velocity/artifacts/context-proposals/`; return to `/grill-me` to explore alternatives.
+   - If it depends: define a more specific follow-up question; run a second, more focused prototype if necessary.
 
-State the time box before starting: "Time box: 30 minutes. We stop when the question is answered, not when the code is clean."
+</process>
 
-### Step 3 — Build the Minimum Spike
+<pitfalls>
 
-Build only what is required to answer the question. Not production-quality. Not tested. Not clean.
+- Starting code before the question is stated in one sentence
+- Exceeding the time box or expanding scope mid-spike
+- Refactoring prototype code into production instead of deleting it
+- Producing more than a one-paragraph finding — the answer must be specific and brief
 
-**Explicitly skip:**
+</pitfalls>
 
-- Error handling
-- Logging
-- Tests
-- Documentation
-- Code organization
-
-**Focus entirely on:** answering the question.
-
-### Step 4 — Run It
-
-Execute the prototype. Observe the behavior. Answer the question.
-
-Produce a one-paragraph finding: "The answer to the question is [yes/no/it depends], because [specific observation from the prototype]."
-
-### Step 5 — Delete the Prototype
-
-Delete all prototype code or move it to a `spike/` branch that will never be merged.
-
-Do not refactor prototype code into production. Prototype code was written to answer a question — not to be shipped.
-
-### Step 6 — Lock In the Answer
-
-"Run /grill-with-docs to incorporate this finding into your design before writing any production code."
-
----
-
-## What Happens After
-
-If the prototype answered "yes" (the approach works):
-
-- The validated approach becomes an input to `/grill-with-docs`
-- The precise interface discovered in the prototype informs the task design in `/to-tasks`
-
-If the prototype answered "no" (the approach does not work):
-
-- The failing approach is documented as a constraint in `.velocity/artifacts/context-proposals/`
-- The developer returns to `/grill-me` to explore alternatives
-
-If the prototype answered "it depends" (more information needed):
-
-- Define a more specific follow-up question
-- Run a second, more focused prototype if necessary
+</prototype>

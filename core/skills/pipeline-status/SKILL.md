@@ -1,150 +1,73 @@
 ---
 name: pipeline-status
-description: >-
-  Show the current state of all in-flight SDLC pipelines for this repository.
-  Reads all state files on the velocity-state branch and produces a compact
-  dashboard: current phase, gate status, blocking relationships, and next
-  action for each work item. Use /pipeline-status or /velocity-status.
-metadata:
-  surfaces:
-    - agent
+description: "Shows the current state of all in-flight SDLC pipelines by reading state files on the velocity-state branch and producing a compact dashboard with current phase, gate status, blocking relationships, and next action per work item."
+mode: subagent
+readonly: false
+tags: ["skill", "pipeline-status", "pipeline", "dashboard", "status"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Pipeline Status
+<pipeline-status>
 
-Report the current state of all in-flight SDLC pipelines.
+<role>
 
-## Context Load
+You are a pipeline status reporter that produces a compact dashboard of all in-flight SDLC pipelines.
 
-Read before starting:
+</role>
 
-1. All `*.yaml` files in `velocity-state` branch → `.velocity/sdlc/state/` — pipeline state files
-2. `.velocity/sdlc/pipeline.yaml` — phase definitions (for display names and owning agents)
-3. `.velocity/sdlc/pipeline-config.yaml` — blocking rules (for cross-pipeline blocking display)
+<purpose>
 
----
+Problem: Developers and agents have no quick way to see the state of all in-flight pipelines, blocking relationships, and which items need human gate reviews.
 
-## Invocation
+Solution: Read all state files on the `velocity-state` branch and render a structured dashboard with current phase, gate status, blocking relationships, and next action for each work item.
 
-### Cursor / Claude Code
+Validation: The dashboard accurately reflects the current state of all `*.yaml` files in `.velocity/sdlc/state/`; blocking relationships are correctly resolved from the fetched branch.
 
-```
-/pipeline-status
-```
+</purpose>
 
-Optional argument: `/pipeline-status [work-id]` — show detailed view for a single pipeline.
+<prerequisites>
 
-### GitHub Copilot
+- All `*.yaml` files in `velocity-state` branch → `.velocity/sdlc/state/` — pipeline state files
+- `.velocity/sdlc/pipeline.yaml` — phase definitions (for display names and owning agents)
+- `.velocity/sdlc/pipeline-config.yaml` — blocking rules (for cross-pipeline blocking display)
 
-```
-velocity-status.prompt.md
-```
+</prerequisites>
 
----
+<process>
 
-## Step 1 — Fetch State Files
+Optional argument: `[work-id]` — show detailed view for a single pipeline instead of summary.
+
+### Step 1 — Fetch State Files
 
 ```bash
 git fetch origin velocity-state 2>/dev/null || true
-git show origin/velocity-state:.velocity/sdlc/state/ 2>/dev/null
 ```
 
-List all `*.yaml` files in `.velocity/sdlc/state/` on the `velocity-state` branch.
+List all `*.yaml` files in `.velocity/sdlc/state/` on the `velocity-state` branch. If none exist: print "No in-flight pipelines. Run /velocity to start one." and stop.
 
-If no files exist: print "No in-flight pipelines. Run /velocity to start one." and stop.
+### Step 2 — Summary Dashboard (default — all pipelines)
 
----
+Render a table with columns: Work Item | Type | Pipeline | Current Phase | Status | Gate | Next Action.
 
-## Step 2 — Produce Dashboard
+Follow with three sections:
+- **Blocking Relationships** — list work items blocked by others, with blocker `work-id`
+- **Pipelines Awaiting Human Gate** — list each with phase name and instruction to run `/phase-gate`
+- **Completed Pipelines (last 7 days)** — work item, completed date, PR number
 
-For each state file, extract the summary fields and render the dashboard.
+Use these symbols for status: ✅ approved · 🔄 in_progress · ⏸ gate-pending · ⬜ pending · ⏭ skipped · ⚠ requires-revision
 
-### Summary View (default — all pipelines)
+### Step 3 — Detailed View (single pipeline, `[work-id]` argument)
 
-```markdown
-## Velocity — Pipeline Status
+Show: work_id, work_type, pipeline_variant, started_at, current_phase, blocking. Then a phase history table (Phase | Status | Started | Completed | Gate | Artifacts). Then separate sections: Skipped Phases (with skip_reason), Rollback History (from `rollback_history` array), Flagged Assumptions (from `phases.*.assumptions`). End with a specific **Next action** instruction.
 
-Updated: [ISO timestamp]
+</process>
 
-| Work Item | Type | Pipeline | Current Phase | Status | Gate | Next Action |
-|-----------|------|----------|--------------|--------|------|-------------|
-| feat-create-policy | new feature | new-feature | build | in_progress | automated | Run /tdd |
-| fix-payment-timeout | bug fix | bug-fix | validate | gate-pending | human | Awaiting your approval |
-| refactor-policy-module | refactor | refactor | analysis | in_progress | — | Architect running |
+<pitfalls>
 
----
+- Reporting stale state — always `git fetch origin velocity-state` before reading state files
+- Omitting skipped phases or rollback history from the detailed single-pipeline view
+- Showing a summary view when the developer requested a specific `work-id` detailed view
 
-### Blocking Relationships
+</pitfalls>
 
-- `feat-create-policy` is blocked by: `feat-domain-model-v2` (not yet approved)
-
----
-
-### Pipelines Awaiting Human Gate
-
-⏸ **fix-payment-timeout** — Validate phase
-   Artifacts ready for review. Run `/phase-gate` to present the gate.
-
----
-
-### Completed Pipelines (last 7 days)
-
-| Work Item | Completed | PR |
-|-----------|-----------|-----|
-| feat-auth-refresh | 2026-06-07 | #88 |
-```
-
----
-
-## Step 3 — Detailed View (single pipeline)
-
-When invoked with a `work-id` argument, show the full phase history for that pipeline.
-
-```markdown
-## Pipeline: [work_id]
-
-Type: [work_type] | Variant: [pipeline_variant]
-Started: [started_at] | Current phase: [current_phase]
-Blocking: [blocking array or "none"]
-
-### Phase History
-
-| Phase | Status | Started | Completed | Gate | Artifacts |
-|-------|--------|---------|-----------|------|-----------|
-| discovery | approved | 2026-06-08T09:00Z | 2026-06-08T10:30Z | human | CONTEXT.md, ADR-042.md |
-| design | approved | 2026-06-08T10:35Z | 2026-06-08T14:00Z | human | feat-create-policy-arch.md |
-| planning | approved | 2026-06-08T14:05Z | 2026-06-08T15:30Z | human | feat-create-policy-tasks.md |
-| build | in_progress | 2026-06-08T16:00Z | — | automated | — |
-| validate | pending | — | — | — | — |
-| review | pending | — | — | — | — |
-| release | pending | — | — | — | — |
-
-### Skipped Phases
-[List any skipped phases with their skip_reason, or "None"]
-
-### Rollback History
-[List any rollback events from rollback_history array, or "None"]
-
-### Flagged Assumptions
-[List all assumptions from phases.*.assumptions across all phases, or "None"]
-
----
-
-**Next action:** [specific instruction — e.g., "Run /tdd for the next task in the build phase" or "Run /phase-gate to present the validate phase artifacts"]
-```
-
----
-
-## Phase Status Symbols
-
-Use these symbols in table output for compact readability:
-
-| Symbol | Status |
-|--------|--------|
-| ✅ | approved |
-| 🔄 | in_progress |
-| ⏸ | gate-pending |
-| ⬜ | pending |
-| ⏭ | skipped |
-| ⚠ | requires-revision |
-| ❌ | — (not reached) |
+</pipeline-status>

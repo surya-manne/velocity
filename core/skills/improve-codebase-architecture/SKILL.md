@@ -1,190 +1,75 @@
 ---
 name: improve-codebase-architecture
-description: >-
-  Detect shallow module anti-patterns and surface deepening opportunities.
-  Finds places where understanding one concept requires bouncing between many
-  small files, where pure functions were extracted just for testability, and
-  where the codebase diverges from CONTEXT.md terminology. Produces a
-  prioritized list of refactoring candidates for developer approval.
-  Run periodically or after any significant surge of agent-driven development.
-metadata:
-  surfaces:
-    - agent
+description: "Detect shallow module anti-patterns and surface deepening opportunities. Finds places where understanding one concept requires bouncing between many small files, where pure functions were extracted just for testability, and where the codebase diverges from CONTEXT.md terminology. Produces a prioritized list of refactoring candidates for developer approval."
+mode: subagent
+readonly: false
+tags: ["skill", "architecture", "refactoring", "code-quality"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Improve Codebase Architecture
+<improve-codebase-architecture>
 
-Analyze this codebase for shallow module patterns and produce a prioritized improvement plan.
+<role>
 
-## Context Load
+You are a codebase architect who detects shallow module anti-patterns, CONTEXT.md terminology drift, and architecture inconsistencies, then produces a prioritized improvement menu for developer approval.
 
-Read before starting:
+</role>
 
-1. `.velocity/project-intelligence/stack.md` — stack fingerprint (module structure, architecture patterns)
-2. `.velocity/knowledge-base/adrs/` — index, then relevant ADRs
-3. CONTEXT.md from `.velocity/context-map.md` (all contexts — for term alignment check)
+<purpose>
 
----
+Problem: Agent-driven development accumulates shallow modules, synonym drift, and architecture inconsistencies that degrade AI output quality and increase cognitive load over time.
 
-## What This Skill Does
+Solution: Analyze the codebase for shallow module patterns, CONTEXT.md term drift, architecture pattern inconsistencies, and false-confidence test patterns — then produce a prioritized, approval-gated list of deepening candidates.
 
-If you have a garbage codebase, the AI will produce garbage within it.
+Validation: A dated architecture review is written to `.velocity/artifacts/architecture-reviews/`, findings are ordered by priority, and no changes are made without explicit developer approval.
 
-This skill finds **deepening opportunities** — places where shallow modules can be deepened to improve navigability, reduce cognitive load, and make the codebase more AI-agent-friendly.
+</purpose>
 
-This skill produces a **menu of candidates**, not a prescription. The developer approves before anything is changed.
+<prerequisites>
 
----
+- `.velocity/project-intelligence/stack.md` — stack fingerprint (module structure, architecture patterns)
+- `.velocity/knowledge-base/adrs/` — index, then relevant ADRs
+- CONTEXT.md from `.velocity/context-map.md` (all contexts — for term alignment check)
 
-## Analysis Protocol
+</prerequisites>
 
-### 1 — Shallow Module Detection
+<process>
 
-A module is shallow when its interface is as complex as its implementation.
+1. **Shallow module detection.** Scan for:
+   - *Many-small-files:* dirs with 10+ files each exporting 1–3 functions; understanding one concept requires 5+ files; "utils"/"helpers" catch-all dirs; pure functions extracted only for testability
+   - *Leaking complexity:* callers must know implementation details; internal data structures in public interfaces; exception types exposing internals
+   - *Tight coupling:* two modules always updated together; functions callers must call in a specific order; required state living outside the module
+   - *Agent-hostile:* naming inconsistent with CONTEXT.md; domain logic spread across 4+ files with no single entry point; behavior requiring multiple files to understand
 
-Scan for:
+2. **CONTEXT.md term alignment.** For each bounded context, scan for: variable/class/function names differing from CONTEXT.md terms; synonym drift (same concept, multiple names across files); concepts in code missing from CONTEXT.md. Report all drift with specific file/line references.
 
-**Many-small-files patterns:**
+3. **Architecture pattern consistency.** Validate detected patterns from `stack.md`:
+   - **DDD:** aggregates enforcing invariants (not leaking to services); domain events at aggregate boundary; repositories returning aggregates
+   - **Event Sourcing:** aggregates rehydrated from events; projections separated from command model; append-only event store
+   - **Hexagonal:** domain model free of framework/infrastructure dependencies; all external integrations behind ports; thin adapter layer
 
-- Directories with 10+ files where each file exports 1–3 functions
-- Module trees where understanding a single concept requires reading 5+ files
-- "Utils" or "helpers" directories (catch-all shallow modules)
-- Pure functions extracted from a class purely for testability
+4. **Test architecture.** Identify false-confidence tests: mocking everything and testing nothing real; in-memory fakes where real behavior differs materially; tests on implementation details (private methods, internal state) rather than behavior; missing tests at critical layer boundaries.
 
-**Leaking complexity:**
+5. **Write architecture review.** Write to `.velocity/artifacts/architecture-reviews/{date}.md` per `templates/artifacts/architecture-review.md`. Structure: 2–3 sentence executive summary, then per finding: title, priority (High/Medium/Low), pattern type, location (file/dir paths), what's wrong, deepening opportunity (with before/after interface comparison if applicable), estimated effort, risk level. Include a CONTEXT.md Term Drift table: code term | correct term | occurrences | action (Rename / Add to CONTEXT.md).
 
-- Modules that require callers to know implementation details to use them
-- Internal data structures exposed in public interfaces
-- Configuration options that reflect implementation choices rather than behavior choices
-- Exception types that expose internal implementation
+6. **Approval gate.** Present findings ordered High → Medium → Low. Request developer approval: "approve all", "approve 1, 3, 5", or "skip". After approval, the Refactor Agent implements approved changes.
 
-**Integration risk patterns:**
+</process>
 
-- Two modules that must always be updated together (tight coupling disguised as separation)
-- Function sequences that callers must always call in a specific order
-- State that lives outside the module but is required for the module to work
+<pitfalls>
 
-**Agent-hostile patterns:**
+- Making refactoring changes without explicit developer approval — this skill produces a menu, not an action plan
+- Running after every task — overhead outweighs benefit for small changes
+- Reporting term drift without specific file/line references
+- Flagging test issues without distinguishing false-confidence from intentional design choices
+- Ordering findings arbitrarily instead of priority-first
 
-- Inconsistent naming that diverges from CONTEXT.md terms
-- Domain logic spread across 4+ files with no single entry point
-- Context that must be accumulated from multiple files to understand one behavior
+</pitfalls>
 
----
+<notes>
 
-### 2 — CONTEXT.md Term Alignment
+Run cadence: after every 3–5 implementation sprints; after a large surge of agent-driven development; before a major new feature touching existing modules; when agent output quality is noticeably degrading. Do not run after every task.
 
-For each bounded context, scan the codebase for:
+</notes>
 
-- Variable names, class names, function names that differ from CONTEXT.md terms
-- Synonym drift: same concept with multiple names in different files
-- Missing terms: concepts that exist in code but are not in CONTEXT.md
-
-Report term drift with specific file/line references.
-
----
-
-### 3 — Architecture Pattern Consistency
-
-Check whether the detected architecture patterns are consistently applied:
-
-**DDD (if detected):**
-
-- Are aggregates correctly enforcing invariants, or is business logic leaking into services?
-- Are domain events being published at the aggregate boundary?
-- Are repositories returning aggregates, not raw entities?
-
-**Event Sourcing (if detected):**
-
-- Are aggregates rehydrated from events?
-- Are projections separated from the command model?
-- Is the event store append-only?
-
-**Hexagonal (if detected):**
-
-- Is the domain model free of framework and infrastructure dependencies?
-- Are all external integrations behind ports (interfaces)?
-- Is the adapter layer thin?
-
----
-
-### 4 — Test Architecture
-
-Identify tests that give false confidence:
-
-- Tests that mock everything and test nothing real
-- Integration tests that use in-memory fakes where the real behavior differs materially
-- Tests that test implementation details (private methods, internal state) rather than behavior
-- Missing tests at critical layer boundaries
-
----
-
-## Output Format
-
-Write to `.velocity/artifacts/architecture-reviews/{date}.md`:
-
-```markdown
-# Architecture Review: {date}
-
-## Summary
-
-{2–3 sentence executive summary of the main finding.}
-
----
-
-## Findings
-
-### Finding 1: {Title} — Priority: High | Medium | Low
-
-**Pattern:** {Shallow module | Leaking complexity | Term drift | Architecture inconsistency | Test gap}
-
-**Location:** {File/directory paths}
-
-**What's wrong:**
-{Explanation of why this is a problem for maintainability or agent output quality}
-
-**Deepening opportunity:**
-{Concrete proposal for how to deepen this module or fix the pattern}
-{Show before/after interface comparison if applicable}
-
-**Estimated effort:** {Hours}
-
-**Risk if addressed:** {Low | Medium | High} — {brief risk note}
-
----
-
-[Repeat for each finding, ordered by priority]
-
----
-
-## CONTEXT.md Term Drift
-
-| Code term | CONTEXT.md term | Occurrences | Action |
-| --------- | --------------- | ----------- | ------ | ----------------- |
-| {term}    | {correct term}  | {N}         | Rename | Add to CONTEXT.md |
-
----
-
-## Approval Request
-
-Review the findings above and approve which ones to address:
-
-- Reply "approve all" to proceed with all findings
-- Reply "approve 1, 3, 5" to address specific findings
-- Reply "skip" to defer all findings to the next review cycle
-
-After approval, the Refactor Agent will implement the approved changes.
-```
-
----
-
-## Running Cadence
-
-Run this skill:
-
-- After every 3–5 implementation sprints
-- After any large surge of agent-driven development
-- Before starting a major new feature that touches the same modules
-- When agent output quality is noticeably degrading
-
-Do not run after every task — the overhead is not worth it for small changes.
+</improve-codebase-architecture>

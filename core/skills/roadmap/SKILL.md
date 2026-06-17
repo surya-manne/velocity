@@ -1,218 +1,68 @@
 ---
 name: roadmap
-description: >-
-  Generate a prioritized roadmap from a feature board. Sequences features by
-  user value, dependency order, and delivery risk. Produces a phased delivery
-  plan where each phase ends with demonstrable, shippable software.
-  Run after to-features, before engineering begins.
-metadata:
-  surfaces:
-    - agent
+description: "Generate a prioritized, phased delivery roadmap from a feature board, sequencing by user value, dependency order, and delivery risk. Full skill."
+mode: subagent
+model: Claude Opus 4.8
+readonly: false
+tags: ["skill", "roadmap", "planning", "sequencing"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Roadmap
+<roadmap>
 
-Generate a phased delivery roadmap from the feature board.
+<role>
 
-## Context Load
+You are a delivery sequencing specialist who produces phased roadmaps where every phase ends with shippable, demonstrable software.
 
-Read before starting:
+</role>
 
-1. `.velocity/artifacts/features/{feature-board}.md` — the feature board to sequence
-2. `.velocity/artifacts/prds/{prd-id}.md` — the originating PRD (goals and priorities)
-3. CONTEXT.md from `.velocity/context-map.md`
+<purpose>
 
----
+Problem: Feature boards without sequencing guidance lead to horizontal-phase delivery plans that cannot be demonstrated or released until everything is done.
 
-## Roadmap Principles
+Solution: Score each feature on user value, dependency depth, and delivery risk; group into phases that respect dependency order, front-load tracers and technical risk, and each end with demonstrable shippable software.
 
-### Phase discipline
+Validation: Every phase contains at least one demonstrable user-facing feature, no phase is "infrastructure only", blocking dependencies are respected, and the dependency graph is acyclic.
 
-Each phase must end with **shippable software** — a set of features a user can interact with.
+</purpose>
 
-No phase is "infrastructure only". No phase produces code that cannot be demonstrated.
+<prerequisites>
 
-A phase is the right size when:
+- Read `.velocity/artifacts/features/{feature-board}.md` — the feature board to sequence
+- Read `.velocity/artifacts/prds/{prd-id}.md` — originating PRD (goals and priorities)
+- Read CONTEXT.md from `.velocity/context-map.md`
+- Run after `to-features`, before engineering begins
 
-- It contains 2–5 features
-- It delivers a coherent user capability (not a collection of unrelated features)
-- It can be completed in a sprint or iteration
-- It can be released independently of future phases
+</prerequisites>
 
-### Sequencing rules
+<process>
 
-1. **Tracer bullets first** — the first phase always contains the tracer feature(s) for each new capability
-2. **Respect blocking dependencies** — a feature blocked by another cannot be in an earlier phase
-3. **Parallelize where possible** — features with no shared blocking dependency can be in the same phase
-4. **Risk front-loading** — features that validate critical technical or product assumptions come early
-5. **Value delivery** — phases should be ordered by user impact, not technical convenience
+1. **Extract and validate features.** List all features with blocking relationships. Identify tracer features (labeled "Tracer" in the feature board). Validate the dependency graph is acyclic — if not, flag the cycle before proceeding. Note parallel execution candidates.
+2. **Score each feature** on three dimensions:
 
-### Anti-patterns to reject
+   | Dimension | Score | Criteria |
+   |-----------|-------|---------|
+   | User value | 1–5 | 5 = core to value proposition; 1 = nice-to-have |
+   | Dependency depth | 1–5 | 5 = nothing blocks it (can start immediately); 1 = deep in the chain |
+   | Delivery risk | 1–5 | 5 = well-understood; 1 = high technical or product uncertainty |
 
-❌ Phase 1: All database schema  
-❌ Phase 2: All API endpoints  
-❌ Phase 3: All UI
+   Priority score: `(user_value × 2) + dependency_depth + delivery_risk`. Use scores to guide sequencing, not override dependency order.
 
-✅ Phase 1: User can create and view a {core entity} (tracer)  
-✅ Phase 2: User can {extend core capability} + {parallel independent capability}  
-✅ Phase 3: User can {complete the full workflow}
+3. **Assign phases.** Group features respecting: (1) dependency order — hard constraint, (2) priority scores — soft guidance, (3) phase coherence — features in a phase form a coherent user capability. Each phase must include at least one demonstrable user-facing feature. Apply sequencing rules: tracers first, respect blocking dependencies, parallelize where possible, front-load risk, order phases by user impact. ❌ Reject: Phase 1: All database schema / Phase 2: All API endpoints. ✅ Accept: Phase 1: User can create and view a {core entity} (tracer).
+4. **Write the roadmap** to `.velocity/artifacts/roadmaps/{prd-id}-v1.md`:
+   - Header: `Version: 1`, `Date`, `Source PRD: .velocity/artifacts/prds/{prd-id}.md`, `Source feature board: .velocity/artifacts/features/{feature-id}.md`
+   - **Summary** — 2–3 sentences on what is delivered and why sequenced this way; total features, phases, estimated duration
+   - For each phase: phase name (user-facing outcome), goal (what a user can do at end of phase), features table (`| Feature | Type | Layers | Blocked by |`), one-sentence sequencing rationale, shippability statement
 
----
+</process>
 
-## Protocol
+<pitfalls>
 
-### Step 1 — Extract and validate features
+- Creating a phase that is "infrastructure only" with no user-facing output
+- Ignoring dependency order in favor of technical convenience
+- Placing a feature in an earlier phase than its blockers allow
+- Failing to front-load tracers and high-risk features
 
-From the feature board:
+</pitfalls>
 
-1. List all features with their blocking relationships
-2. Identify tracer features (labeled "Tracer" in the feature board)
-3. Validate the dependency graph is acyclic — if not, flag the cycle before proceeding
-4. Note parallel execution candidates from the feature board's dependency map
-
-### Step 2 — Score each feature
-
-For each feature, assign a score on three dimensions:
-
-| Dimension        | Score | Criteria                                                             |
-| ---------------- | ----- | -------------------------------------------------------------------- |
-| User value       | 1–5   | 5 = core to the product's value proposition; 1 = nice-to-have        |
-| Dependency depth | 1–5   | 5 = nothing blocks it (can start immediately); 1 = deep in the chain |
-| Delivery risk    | 1–5   | 5 = well-understood; 1 = high technical or product uncertainty       |
-
-Calculate priority score: `(user_value × 2) + dependency_depth + delivery_risk`
-
-Use scores to guide sequencing, not override dependency order.
-
-### Step 3 — Assign phases
-
-Group features into phases respecting:
-
-1. Dependency order (hard constraint)
-2. Priority scores (soft guidance)
-3. Phase coherence (features in a phase should form a coherent user capability)
-
-Each phase must include at least one user-facing feature that can be demonstrated.
-
-### Step 4 — Write the roadmap
-
----
-
-## Output Format
-
-Write to `.velocity/artifacts/roadmaps/{prd-id}-v1.md`:
-
-```markdown
-# Roadmap: {PRD Name}
-
-## Version: 1
-
-## Date: {date}
-
-## Source PRD: .velocity/artifacts/prds/{prd-id}.md
-
-## Source feature board: .velocity/artifacts/features/{feature-id}.md
-
----
-
-## Summary
-
-{2–3 sentences: what this roadmap delivers and why it is sequenced this way.}
-
-**Total features:** {N}
-**Phases:** {N}
-**Estimated duration:** {N} sprints / iterations
-
----
-
-## Phase 1: {Phase name — user-facing outcome}
-
-**Goal:** {What a user can do at the end of this phase that they could not do before}
-
-**Features:**
-
-| Feature     | Type   | Layers                 | Blocked by |
-| ----------- | ------ | ---------------------- | ---------- |
-| {Feature 1} | Tracer | UI · API · Persistence | —          |
-| {Feature 2} | Tracer | API · Persistence      | —          |
-
-**Why this phase:** {One sentence explaining the sequencing rationale}
-
-**Shippable?** Yes — {describe what can be released at the end of this phase}
-
----
-
-## Phase 2: {Phase name — user-facing outcome}
-
-**Goal:** {What a user can do at the end of this phase}
-
-**Features:**
-
-| Feature     | Type      | Layers                 | Blocked by       |
-| ----------- | --------- | ---------------------- | ---------------- |
-| {Feature 3} | Expansion | UI · API · Persistence | Phase 1 complete |
-| {Feature 4} | Expansion | UI · API               | Phase 1 complete |
-
-**Parallel candidates:** Feature 3 and Feature 4 can be worked simultaneously.
-
-**Why this phase:** {Sequencing rationale}
-
-**Shippable?** Yes — {describe the release}
-
----
-
-[Repeat for all phases]
-
----
-
-## Full Dependency Map
-
-{ASCII or list representation spanning all phases}
-
-Feature 1 (Tracer) → Feature 3, Feature 4
-Feature 2 (Tracer) → Feature 5
-Feature 3, Feature 5 → Feature 6
-
----
-
-## Risks and Mitigations
-
-| Risk             | Likelihood          | Phase affected | Mitigation            |
-| ---------------- | ------------------- | -------------- | --------------------- |
-| {Technical risk} | High / Medium / Low | Phase {N}      | {Mitigation approach} |
-
----
-
-## Next Step
-
-Run /to-tasks on each feature in Phase 1 to generate the task board for immediate execution.
-```
-
----
-
-## Versioning
-
-When a roadmap is revised (features added, phases re-sequenced, scope changed):
-
-1. Archive the existing roadmap: rename to `{prd-id}-v{N}-archived-{date}.md`
-2. Write the new version as `{prd-id}-v{N+1}.md`
-3. Add a change summary at the top of the new version:
-
-```markdown
-## Change from v{N}: {one sentence describing what changed and why}
-```
-
-Never delete previous roadmap versions. The history is the audit trail.
-
----
-
-## Quality Checks
-
-Before finalizing:
-
-1. Every phase ends with demonstrable, shippable software — no infrastructure-only phases.
-2. No dependency violations — no feature appears in a phase before its blockers.
-3. Every tracer feature is in Phase 1 (or as early as possible for its dependency chain).
-4. Risks are listed with mitigations — not just acknowledged.
-5. The full dependency map is acyclic.
-6. All terms match CONTEXT.md.
+</roadmap>

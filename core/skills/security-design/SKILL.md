@@ -1,207 +1,83 @@
 ---
 name: security-design
-description: >-
-  Produce a security design for a feature: threat model, trust boundary map,
-  data classification, auth/authz design, and compliance obligations. Aligned
-  to the detected security posture from project-context/security.md and
-  existing security ADRs. Stores the output under .velocity/artifacts/security/.
-  Invoked by the Security Agent or Architecture Agent when a feature touches
-  auth, PII, payments, trust boundaries, or public API surface.
-metadata:
-  surfaces:
-    - agent
+description: "Produce a security design for a feature: threat model, trust boundary map, data classification, auth/authz design, and compliance obligations. Invoked by the Security Agent or Architecture Agent when a feature touches auth, PII, payments, trust boundaries, or public API surface."
+mode: skill
+readonly: false
+tags: ["skill", "security", "design", "compliance"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Security Design
+<security-design>
 
-Produce a security design for this feature.
+<role>
 
-## Context Load
+You are a security architect who produces structured security designs — threat models, trust boundary maps, data classification tables, auth/authz designs, and compliance checklists — scoped precisely to triggered security domains.
 
-Read before starting:
+</role>
 
-1. `.velocity/project-context/security.md` — security standards, compliance obligations, auth model
-2. CONTEXT.md at the path from `.velocity/context-map.md` for the relevant bounded context
-3. `.velocity/knowledge-base/adrs/index.md` — identify security-related ADRs
-4. Full body of every ADR with "security", "auth", "PII", "encryption", or "compliance" in the title
-5. `.velocity/artifacts/prds/` — relevant PRD (if it exists)
-6. `.velocity/artifacts/architecture/` — relevant architecture doc (if it exists)
+<purpose>
 
----
+Problem: Features touching auth, PII, payments, or public API surfaces ship without documented security decisions, leaving threat models implicit and compliance obligations unverified.
 
-## Step 1 — Security Trigger Assessment
+Solution: Apply a trigger-based security assessment that only produces sections where risk signals are present, covering STRIDE threat modeling, trust boundaries, data classification, auth/authz design, compliance checklists, and secrets management.
 
-Determine which security disciplines apply to this feature:
+Validation: Every triggered section is complete; no untriggered sections are produced; all domain terms match CONTEXT.md; ADR candidates are flagged; design is written to disk after developer approval.
 
-| Trigger                      | Present? | Action                                                |
-| ---------------------------- | -------- | ----------------------------------------------------- |
-| PII stored or processed      | {yes/no} | Data classification required                          |
-| Payments or financial data   | {yes/no} | PCI-DSS checklist required                            |
-| Authentication changes       | {yes/no} | Auth design section required                          |
-| New public API endpoint      | {yes/no} | Input validation + rate limiting required             |
-| Cross-service trust boundary | {yes/no} | mTLS / service identity design required               |
-| File upload or download      | {yes/no} | Content scanning + path traversal protection required |
-| Third-party integration      | {yes/no} | Secrets management + webhook verification required    |
-| HIPAA obligations            | {yes/no} | Access audit logging required                         |
+</purpose>
 
-Only complete sections that are triggered. Do not produce a security design for risks that do not apply.
+<prerequisites>
 
----
+-  — security standards, compliance obligations, auth model
+- CONTEXT.md from  for the relevant bounded context
+-  — identify security-related ADRs
+-  and  — feature context (if exists)
 
-## Step 2 — Threat Model
+</prerequisites>
 
-Identify threats using the STRIDE model:
+<process>
 
-| Threat                     | Example for this feature                    | Mitigation                                          |
-| -------------------------- | ------------------------------------------- | --------------------------------------------------- |
-| **Spoofing**               | Caller claims identity without proof        | JWT validation, mTLS, API key rotation              |
-| **Tampering**              | Request body modified in transit            | HTTPS, request signing, HMAC                        |
-| **Repudiation**            | Deny performing an action                   | Immutable audit log, signed events                  |
-| **Information Disclosure** | Leak PII in error messages                  | Sanitised error responses, field-level encryption   |
-| **Denial of Service**      | Flood endpoint with requests                | Rate limiting, circuit breakers, queue depth limits |
-| **Elevation of Privilege** | Access resource belonging to another tenant | Attribute-based access control, row-level security  |
+**Step 1 — Trigger Assessment**
+Determine which security disciplines apply: PII storage/processing, payments/financial data, authentication changes, new public API endpoint, cross-service trust boundary, file upload/download, third-party integration, HIPAA obligations. Only complete triggered sections.
 
-For each threat: state whether it applies, the specific risk in this feature's context, and the mitigation approach.
+**Step 2 — Threat Model (STRIDE)**
+For each threat: state whether it applies, the specific risk in this feature context, and the mitigation approach.
+- Spoofing → JWT validation, mTLS, API key rotation
+- Tampering → HTTPS, request signing, HMAC
+- Repudiation → Immutable audit log, signed events
+- Information Disclosure → Sanitised errors, field-level encryption
+- Denial of Service → Rate limiting, circuit breakers, queue depth limits
+- Elevation of Privilege → ABAC, row-level security
 
----
+**Step 3 — Trust Boundary Map**
+Produce ASCII diagram showing all service-to-service and client-to-service boundaries. For each boundary: identity verification, transport encryption, and data that crosses.
 
-## Step 3 — Trust Boundary Map
+**Step 4 — Data Classification**
+Table every data element: classification (Public/Internal/Confidential/PII/PCI/PHI), at-rest encryption, in-transit encryption, retention, and access scope.
 
-Produce a trust boundary diagram (ASCII):
+**Step 5 — Auth/Authz Design** (if triggered)
+Document: mechanism, token lifetime and rotation, validation location, failure modes, authorization model (RBAC/ABAC/ownership/policy), enforcement location, least privilege confirmation.
 
-```
-[External Client] — HTTPS/JWT → [API Gateway] — mTLS → [Service A]
-                                                              |
-                                                   [DB: encrypted at rest]
-```
+**Step 6 — Compliance Checklist** (triggered packs only: PCI-DSS / HIPAA / SOC2)
+Run only checklists relevant to detected triggers.
 
-For each boundary, state:
+**Step 7 — Secrets Management**
+Table every secret: type, storage (secrets manager/HSM/KMS), rotation cadence, exposure scope. Rules: no secrets in source-controlled env vars; no secrets in logs or error responses.
 
-- The identity verification mechanism
-- The transport encryption mechanism
-- What data crosses this boundary
+**Step 8 — Review and Write**
+Present to developer. On approval: generate slug (lowercase, hyphens), write to , update knowledge-base index.
 
----
+**Step 9 — Flag ADR Candidates**
+Evaluate significant security decisions against the three-criteria gate. Suggest  for qualifying decisions.
 
-## Step 4 — Data Classification
+</process>
 
-For every data element handled by this feature:
+<pitfalls>
 
-| Field           | Classification | At-rest encryption | In-transit encryption | Retention  | Accessible to  |
-| --------------- | -------------- | ------------------ | --------------------- | ---------- | -------------- |
-| `email`         | PII            | Required           | HTTPS                 | 90 days    | Owner only     |
-| `paymentMethod` | PCI            | Required (PCI-DSS) | HTTPS                 | 7 years    | Processor only |
-| `orderId`       | Internal       | Not required       | HTTPS                 | Indefinite | Service        |
+- Producing security sections for untriggered risks — dilutes reviewer attention
+- Missing compliance pack obligations from 
+- Using domain terms not in CONTEXT.md
+- Proposing mitigations without documenting the specific threat they address
 
-Classifications: `Public` | `Internal` | `Confidential` | `PII` | `PCI` | `PHI`
+</pitfalls>
 
----
-
-## Step 5 — Authentication and Authorization Design
-
-If authentication or authorization changes are triggered:
-
-**Authentication:**
-
-- Mechanism: (JWT / OAuth2 / API Key / Session / mTLS)
-- Token lifetime and rotation policy
-- Token validation location (gateway vs. service)
-- Failure mode: what happens when authentication fails
-
-**Authorization:**
-
-- Model: (RBAC / ABAC / ownership-based / policy-based)
-- Policy: which roles or attributes allow which operations
-- Enforcement location: (middleware / service layer / database row-level)
-- Least privilege: confirm the minimum permission set required
-
----
-
-## Step 6 — Compliance Checklist
-
-Apply only the checklists relevant to this feature (from `security.md`):
-
-### PCI-DSS (if payment data present)
-
-- [ ] Cardholder data never stored after authorisation
-- [ ] No full PAN in logs
-- [ ] Encryption of cardholder data at rest (AES-256)
-- [ ] Access to cardholder data limited to need-to-know
-- [ ] All access to cardholder data logged
-
-### HIPAA (if PHI present)
-
-- [ ] Minimum necessary standard applied
-- [ ] PHI encrypted at rest and in transit
-- [ ] Access logs for all PHI access
-- [ ] Patient right-to-deletion path documented
-
-### SOC2 (if applicable)
-
-- [ ] Audit log for all data mutations
-- [ ] Access control reviewed
-- [ ] Encryption in place for sensitive data
-
----
-
-## Step 7 — Secrets Management
-
-For any secrets introduced by this feature:
-
-| Secret            | Type           | Storage         | Rotation | Exposed to           |
-| ----------------- | -------------- | --------------- | -------- | -------------------- |
-| `STRIPE_API_KEY`  | API key        | Secrets manager | 90 days  | Payment service only |
-| `JWT_PRIVATE_KEY` | Asymmetric key | HSM / KMS       | Annual   | Auth service only    |
-
-Rules:
-
-- Secrets never in environment variables checked into source control
-- Secrets never in log output
-- Secrets never in error messages returned to callers
-
----
-
-## Step 8 — Present for Review
-
-Show the developer the security design:
-
-> "Here is the security design. Review threats, mitigations, and data classification. Say 'approve' to write it to disk."
-
----
-
-## Step 9 — Write the Security Design
-
-When the developer approves:
-
-1. Generate slug from feature name: lowercase, hyphens.
-2. Write to: `.velocity/artifacts/security/{slug}.md` using `templates/artifacts/security-design.md`
-3. Update `.velocity/knowledge-base/index.md`:
-   - Add: `| security | {title} | .velocity/artifacts/security/{slug}.md | {date} |`
-
-Say: "Security design written to `.velocity/artifacts/security/{slug}.md`."
-
----
-
-## Step 10 — Flag ADR Candidates
-
-Evaluate each significant security decision against the three-criteria gate. Common security ADR triggers:
-
-- Choosing RBAC over ABAC for a specific use case
-- Storing tokens in cookies vs. localStorage
-- Adopting field-level encryption for a specific data class
-- Choosing a specific key management approach
-
-If any decision qualifies: suggest invoking `/adr-engine`.
-
----
-
-## Security Design Quality Rules
-
-A design that fails any rule should be revised:
-
-- All threats assessed, not just the obvious ones
-- Every mitigation is specific — not "use HTTPS" but "HTTPS enforced at ingress; HSTS enabled"
-- Data classification covers every field that crosses a service boundary
-- Auth model states enforcement location explicitly
-- No secrets in plaintext anywhere in the document
-- Compliance items checked only against obligations that actually apply
+</security-design>

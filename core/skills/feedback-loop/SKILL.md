@@ -1,188 +1,73 @@
 ---
 name: feedback-loop
-description: >-
-  Deterministic feedback gates enforced inside agent sessions during
-  implementation. Run typecheck after every generated file, full test suite
-  after every red-green-refactor cycle, lint before any commit. If any gate
-  fails, stop and fix before proceeding. Not a PR check — an in-session
-  implementation discipline.
-metadata:
-  surfaces:
-    - agent
+description: "Deterministic feedback gates enforced inside agent sessions during implementation. Run typecheck after every generated file, full test suite after every red-green-refactor cycle, lint before any commit. If any gate fails, stop and fix before proceeding. Not a PR check — an in-session implementation discipline."
+mode: subagent
+readonly: false
+tags: ["skill", "tdd", "quality", "testing", "implementation"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Feedback Loop
+<feedback-loop>
 
-Enforce deterministic quality gates at the point of implementation — not at PR time.
+<role>
 
-## Context Load
+You are a quality gate enforcer who runs deterministic typecheck, test, and lint gates at precise points in the implementation cycle and blocks progress on any failure.
 
-Read before starting:
+</role>
 
-1. `.velocity/guardrails/default.md` — gate configuration (`feedback_loops` section)
-2. `.velocity/project-context/testing.md` — test run commands and coverage thresholds
+<purpose>
 
----
+Problem: Agents without enforced feedback gates accumulate type errors, regressions, and lint violations across a session and ship broken code because no gate stopped it.
 
-## Purpose
+Solution: Enforce three mandatory gates at exact points — typecheck after every file, full test suite after every red-green-refactor cycle, lint before every commit — and fix failures before proceeding.
 
-Feedback loops are not optional. They are the mechanism that keeps agent output honest.
+Validation: Every TDD session ends with all gates green, and the session summary reports every failure caught and fixed.
 
-An agent without feedback loops will:
+</purpose>
 
-- Generate files with type errors it cannot see
-- Pass tests locally that break downstream
-- Accumulate lint violations across a session
-- Ship broken code because no gate stopped it
+<prerequisites>
 
-This skill defines exactly when to run each gate and what to do when a gate fails.
+- `.velocity/guardrails/default.md` — gate configuration (`feedback_loops` section)
+- `.velocity/project-context/testing.md` — test run commands and coverage thresholds
 
----
+</prerequisites>
 
-## Gate 1 — Typecheck (after every generated file)
+<process>
 
-**When:** Immediately after writing or modifying any source file.
+**Gate 1 — Typecheck** (after every generated or modified source file)
 
-**Command:** Read from `testing.md` → `{typecheck_command}` (e.g., `tsc --noEmit`, `mvn compile`, `go build ./...`, `mypy`)
+Command: `{typecheck_command}` from `testing.md` (e.g. `tsc --noEmit`, `mvn compile`, `go build ./...`, `mypy`). Pass = exit code 0. On failure: show full error output, fix in the generated file, re-run. Do not batch typechecks — accumulated errors compound and become hard to trace.
 
-**Pass condition:** Exit code 0.
+**Gate 2 — Test Suite** (after every red-green-refactor cycle, full suite)
 
-**On failure:**
+Command: `{test_command}` from `testing.md`. Pass = zero failures, zero errors. On failure: if regression → fix before writing the next test; if new test → return to green step. Never add a failing test on top of an existing failing test. After each cycle, note coverage; warn (do not block) if trending below `test_coverage_minimum` from guardrails.
 
-1. Show the full error output.
-2. Fix the error in the generated file.
-3. Re-run typecheck.
-4. Do not proceed to the next file until exit code is 0.
+**Gate 3 — Lint** (before any `git commit`)
 
-**Do not batch typechecks.** Run after each file. Accumulated type errors compound and become hard to trace.
+Command: `{lint_command}` from `testing.md`. Pass = zero errors (warnings allowed). On failure: fix errors, use auto-fix if supported (`--fix`, `rubocop -a`), re-run. Do not commit until lint exits clean.
 
----
+**Gate sequence in a TDD cycle:**
+File write → Gate 1 → test file write → Gate 1 → red (confirm fail) → implement minimum → Gate 1 → green (confirm pass) → refactor → Gate 1 → Gate 2 → [next cycle] → Gate 3 before commit.
 
-## Gate 2 — Test Suite (after every red-green-refactor cycle)
+**Gate bypass rules.** Read guardrails before assuming a gate applies. Gates may only be bypassed when explicitly disabled in guardrails:
+- `typecheck_on_every_generated_file: false` → skip Gate 1
+- `test_after_every_red_green_cycle: false` → skip Gate 2
+- `lint_before_commit: false` → skip Gate 3
 
-**When:** After completing the refactor step of each TDD cycle (not just the new test — the full suite).
+**Reporting.** After each gate failure and fix: report gate name, error encountered, fix applied, re-run result. End-of-session summary: gates run (typecheck N, suite N, lint N), failures caught and fixed, final state.
 
-**Command:** Read from `testing.md` → `{test_command}` (e.g., `npm test`, `./gradlew test`, `pytest`, `go test ./...`, `bundle exec rspec`)
+**Deep module gate** *(when `module_architecture.deep_module_enforcement: true` in guardrails).* After each refactor step, check: does the module interface expose more than needed? Is there caller complexity that belongs in the module? Are there multiple small single-caller functions to collapse? If yes, propose a deepening — do not apply automatically. Log to `.velocity/artifacts/architecture-reviews/shallow-modules-{date}.md` (append if exists). Flag patterns: module with 1–2 functions and no shared state; interface with more parameters than meaningful variations; helper/util modules with 5+ unrelated functions.
 
-**Pass condition:** All tests pass. Zero failures, zero errors.
+</process>
 
-**On failure:**
+<pitfalls>
 
-1. Show the failing test output.
-2. Determine if the failure is in the new test or a regression.
-3. If regression: fix it before writing the next test. Do not add failing tests on top of failing tests.
-4. If new test: the implementation is incomplete — return to green step.
-5. Re-run the full suite.
-6. Do not proceed until the full suite is green.
+- Batching typechecks instead of running after each file — errors compound and become hard to trace
+- Adding a failing test on top of existing failing tests instead of fixing the regression first
+- Committing without running lint
+- Bypassing an enabled gate without reading guardrails first
+- Marking a TDD cycle complete before the full test suite (not just the new test) is green
 
-**Coverage check:** After each cycle, note current coverage. Warn (do not block) if coverage is trending below `test_coverage_minimum` from guardrails config.
+</pitfalls>
 
----
-
-## Gate 3 — Lint (before any commit)
-
-**When:** Before executing any `git commit` command.
-
-**Command:** Read from `testing.md` → `{lint_command}` (e.g., `npm run lint`, `./gradlew checkstyle`, `flake8`, `golangci-lint run`, `rubocop`)
-
-**Pass condition:** Zero errors. Warnings are acceptable — errors block commit.
-
-**On failure:**
-
-1. Show the lint errors.
-2. Fix all errors (auto-fix if the linter supports it: `npm run lint --fix`, `rubocop -a`).
-3. Re-run lint.
-4. Do not commit until lint exits clean.
-
----
-
-## Gate Sequence in a TDD Cycle
-
-```
-Write source file
-    ↓
-Gate 1: Typecheck → fix if fail
-    ↓
-Write test file
-    ↓
-Gate 1: Typecheck → fix if fail
-    ↓
-Run test (red — confirm failure)
-    ↓
-Implement minimum to pass
-    ↓
-Gate 1: Typecheck → fix if fail
-    ↓
-Run test (green — confirm pass)
-    ↓
-Refactor
-    ↓
-Gate 1: Typecheck → fix if fail
-    ↓
-Gate 2: Full test suite → fix regressions if any
-    ↓
-[next TDD cycle]
-    ↓
-...
-    ↓
-Before git commit:
-Gate 3: Lint → fix if fail
-    ↓
-Commit
-```
-
----
-
-## Gate Bypass Rules
-
-Gates may only be bypassed when:
-
-- **`typecheck_on_every_generated_file: false`** in guardrails → skip Gate 1
-- **`test_after_every_red_green_cycle: false`** in guardrails → skip Gate 2
-- **`lint_before_commit: false`** in guardrails → skip Gate 3
-
-Always read guardrails before assuming a gate applies. Never bypass a gate that is enabled.
-
----
-
-## Reporting
-
-After any gate failure and fix, report:
-
-```
-Gate 1 (Typecheck) — ❌ Failed
-Error: src/payments/service.ts:47 — Type 'string' is not assignable to type 'PaymentId'
-Fix applied: Changed type annotation to PaymentId
-Re-run: ✅ Pass
-```
-
-At the end of a TDD session, report gate summary:
-
-```
-Feedback Loop Summary
-Gates run: 12 typecheck, 6 full-suite, 1 lint
-Failures caught: 2 type errors, 1 regression (fixed before next cycle)
-Final state: ✅ All gates green
-```
-
----
-
-## Deep Module Gate (conditional)
-
-When `module_architecture.deep_module_enforcement: true` in guardrails:
-
-After each refactor step, ask:
-
-- Does this module's interface expose more than it needs to?
-- Is there complexity in the caller that belongs in the module?
-- Are there multiple small functions with a single caller that should be collapsed?
-
-If yes: propose a deepening. Do not apply it automatically — surface it as a finding.
-
-Flag shallow module patterns:
-
-- Module with 1–2 functions and no shared state (extract only for testability, not for real reuse)
-- Interface with more parameters than the implementation has meaningful variations
-- Helper/util modules with 5+ unrelated functions
-
-Log each finding to `.velocity/artifacts/architecture-reviews/shallow-modules-{date}.md` (append if file exists).
+</feedback-loop>

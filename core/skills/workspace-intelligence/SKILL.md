@@ -1,261 +1,96 @@
 ---
 name: workspace-intelligence
-description: >-
-  Discover and build the multi-repo workspace graph. Reads all registered
-  repositories, maps bounded contexts across repos, validates CONTEXT.md
-  consistency, and writes workspace.md with the complete workspace graph.
-  Run automatically by /workspace-setup and /sync. Invoke manually when
-  repositories are added or removed from the workspace.
-metadata:
-  surfaces:
-    - agent
+description: "Discover and build the multi-repo workspace graph, map bounded contexts across repos, validate CONTEXT.md consistency, and write workspace.md and graph.md. Full skill."
+mode: subagent
+model: Claude Opus 4.8
+readonly: false
+tags: ["skill", "workspace", "multi-repo", "graph"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Workspace Intelligence Engine
+<workspace-intelligence>
 
-Build the workspace graph from all registered repositories.
+<role>
 
-## Context Load
+You are a workspace graph builder who discovers repositories, maps bounded contexts, validates consistency, and produces the workspace-level context index.
 
-Read before starting:
+</role>
 
-- `.velocity/workspace.md` (if it exists) — current workspace registration
-- `schemas/workspace.schema.json` — workspace.md schema
-- `.velocity/context-map.md` (if it exists) — current workspace context map
+<purpose>
 
----
+Problem: Multi-repo workspaces have no coherent view of how repositories relate, which bounded contexts exist, or whether CONTEXT.md files are consistent across the workspace.
 
-## Purpose
+Solution: Read `.velocity/workspace.md`, scan all registered repositories using Project Intelligence fingerprinting signals, validate consistency issues, build a workspace graph, and generate a knowledge-base index.
 
-The Workspace Intelligence Engine does three things:
+Validation: `.velocity/workspace-intelligence/graph.md` and `.velocity/knowledge-base/workspace-index.md` are written; all consistency issues (missing CONTEXT.md, duplicate context IDs, undeclared references, stale entries) are reported.
 
-1. **Multi-repo discovery** — scan all registered repositories for stack signals and bounded contexts
-2. **Workspace graph** — build a coherent picture of how repositories relate to each other
-3. **Context map consolidation** — collect all CONTEXT.md files across all repos into a single workspace-level context map
+</purpose>
 
----
+<prerequisites>
 
-## Step 1 — Load Workspace Registration
+- Read `.velocity/workspace.md` (if it exists) — current workspace registration; if missing halt: "No workspace.md found. Run /workspace-setup to initialise this workspace repository."
+- Read `schemas/workspace.schema.json` — workspace.md schema
+- Read `.velocity/context-map.md` (if it exists) — current workspace context map
+- Run automatically by /workspace-setup and /sync; invoke manually when repositories are added or removed
 
-Read `.velocity/workspace.md`.
+</prerequisites>
 
-Extract:
+<process>
 
-- `workspace` metadata (name, architecture style, shared patterns, domains)
-- `repositories[]` — list of all registered repos
+1. **Load workspace registration.** Read `.velocity/workspace.md`. Extract: `workspace` metadata (name, architecture style, shared patterns, domains) and `repositories[]` list.
 
-If no `workspace.md` exists: halt and output:
+2. **Discover repository intelligence.** For each repository in `repositories[]`:
 
-```
-No workspace.md found. Run /workspace-setup to initialise this workspace repository.
-```
+   Determine access method:
 
----
+   | Scenario | Method |
+   |----------|--------|
+   | Workspace is a monorepo | Read sub-directories directly (e.g. `services/<repo-id>/`) |
+   | Workspace is a multi-repo workspace | Read from locally cloned copies under `.velocity/repo-cache/<id>/` |
+   | Repository is remote and not cached | Log as "not accessible" — skip stack scan, preserve existing entry |
 
-## Step 2 — Discover Repository Intelligence
+   If accessible: scan using the same fingerprinting protocol as Project Intelligence (stack.md signals). Record for each repository:
+   ```yaml
+   id: <repo-id>
+   accessible: true | false
+   stack_summary: "<1-line: language, framework, main patterns>"
+   bounded_contexts_detected: [<list of context IDs>]
+   last_scanned_at: <ISO 8601>
+   ```
 
-For each repository in `repositories[]`:
+   For each bounded context in `context_map.contexts`: resolve path `<repo-root>/<context.path>`, check if file exists, extract term count from `## Terms` section.
 
-### 2a — Determine Access Method
+3. **Validate workspace consistency.** Check and report all issues:
 
-Repositories in a workspace are read in one of two ways:
+   - **Missing CONTEXT.md**: `⚠ context_map entry [{id}] in repository [{repo}] points to {path} which does not exist. Action: Run /grill-with-docs in {repo} to populate the glossary.`
+   - **Context ID conflicts** (same ID in two repos): `⚠ Duplicate context ID [{id}] declared in [{repo-1}] and [{repo-2}]. Action: Rename one context ID in workspace.md.`
+   - **Undeclared repository references**: `⚠ context_map entry [{id}] references repository [{repo-id}] which is not registered. Action: Add [{repo-id}] to repositories[] or correct the reference.`
+   - **Stale repository entries** (last_synced_at > 30 days old): `ℹ Repository [{repo}] has not synced in {N} days. Recommend: run /sync in [{repo}].`
 
-| Scenario                            | Method                                                             |
-| ----------------------------------- | ------------------------------------------------------------------ |
-| Workspace is a monorepo             | Read sub-directories directly (e.g. `services/<repo-id>/`)         |
-| Workspace is a multi-repo workspace | Read from locally cloned copies under `.velocity/repo-cache/<id>/` |
-| Repository is remote and not cached | Log as "not accessible" — skip stack scan, preserve existing entry |
+4. **Build workspace graph.** Produce `.velocity/workspace-intelligence/graph.md` conforming to `schemas/workspace.schema.json`. Required sections: `version`, `generated_at`, `workspace` (name, architecture_style, shared_patterns, domains), `repositories[]` (id, name, accessible, stack_summary, bounded_contexts[], last_scanned_at), `context_graph[]` (context_id, context_name, repository, path, context_exists, term_count, depends_on[]), `cross_repo_dependencies[]` (from_context, to_context, relationship [uses_terms|extends|integrates_with], description).
+   
+   Infer cross-repo dependencies from: `dependencies` in `context_map.contexts[]`, shared domain names, explicit integration patterns.
 
-If repositories are accessible: scan each one using the same fingerprinting protocol as Project Intelligence (stack.md signals).
+5. **Update workspace.md.** Update `generated_at` to current timestamp and `repositories[].last_synced_at` for successfully scanned repositories. Do not change any other fields — this is the developer-managed registration file.
 
-Record for each repository:
+6. **Generate workspace knowledge base index.** Write `.velocity/knowledge-base/workspace-index.md` with sections: Repositories table (name, domain, stack, contexts), Bounded Contexts table (name, repo, CONTEXT.md exists, term count), Cross-Repo Context Dependencies (from graph.md), Shared Standards (links to `.velocity/project-context/engineering.md`, `security.md`, `testing.md`, `api.md`). Header: `Generated: <date>`.
 
-```yaml
-id: <repo-id>
-accessible: true | false
-stack_summary: "<1-line description: language, framework, main patterns>"
-bounded_contexts_detected: [<list of context IDs detected from source>]
-last_scanned_at: <ISO 8601>
-```
+7. **Report** concisely: workspace name, architecture, domains; repositories scanned (accessible vs not); bounded contexts (CONTEXT.md present vs missing); issues (or "None"); the written paths (`graph.md`, `workspace-index.md`); and next-step recommendations.
 
-### 2b — Read Existing CONTEXT.md Files
+</process>
 
-For each bounded context in `context_map.contexts`:
+<pitfalls>
 
-1. Resolve the path: `<repo-root>/<context.path>`
-2. If the file exists: record `context_exists: true`, extract the term count from `## Terms` section
-3. If the file does not exist: record `context_exists: false`
+- Modifying fields in `workspace.md` beyond `generated_at` and `last_scanned_at` — it is developer-managed
+- Skipping validation step — consistency issues must be reported even if graph generation succeeds
+- Treating inaccessible repositories as errors instead of logging and continuing
 
----
+</pitfalls>
 
-## Step 3 — Validate Workspace Consistency
+<notes>
 
-Check for these issues and report them:
+**Delta Mode (for /sync):** When invoked with `--delta`: (1) read existing `.velocity/workspace-intelligence/graph.md`, (2) re-scan only repositories whose `last_scanned_at` is older than 7 days or whose `workspace.md` entry has changed, (3) check for new CONTEXT.md files created since last scan, (4) update graph.md with changed entries only, (5) regenerate `workspace-index.md`, (6) report what changed and what was skipped.
 
-### 3a — Missing CONTEXT.md Files
+</notes>
 
-```
-⚠ context_map entry [{id}] in repository [{repo}] points to {path} which does not exist.
-  Action: Run /grill-with-docs in {repo} to populate the glossary.
-```
-
-### 3b — Context ID Conflicts
-
-If two repositories declare the same context ID:
-
-```
-⚠ Duplicate context ID [{id}] declared in [{repo-1}] and [{repo-2}].
-  Action: Rename one context ID in workspace.md to resolve the conflict.
-```
-
-### 3c — Undeclared Repository References
-
-If a `context_map` entry references a `repository` ID that is not in `repositories[]`:
-
-```
-⚠ context_map entry [{id}] references repository [{repo-id}] which is not registered.
-  Action: Add [{repo-id}] to repositories[] in workspace.md or correct the reference.
-```
-
-### 3d — Stale Repository Entries
-
-If `last_synced_at` on a repository entry is over 30 days old:
-
-```
-ℹ Repository [{repo}] has not synced with workspace intelligence in {N} days.
-  Recommend: run /sync in [{repo}] to refresh.
-```
-
----
-
-## Step 4 — Build Workspace Graph
-
-Produce a workspace graph in `.velocity/workspace-intelligence/graph.md`:
-
-```yaml
-version: "2.0"
-generated_at: <ISO 8601>
-
-workspace:
-  name: <workspace name>
-  architecture_style: <style>
-  shared_patterns: [<list>]
-  domains: [<list>]
-
-repositories:
-  - id: <id>
-    name: <name>
-    accessible: true | false
-    stack_summary: <summary>
-    bounded_contexts: [<list of context IDs>]
-    last_scanned_at: <timestamp>
-
-context_graph:
-  - context_id: <id>
-    context_name: <name>
-    repository: <repo-id>
-    path: <path>
-    context_exists: true | false
-    term_count: <N>
-    depends_on: [<list of context IDs>]
-
-cross_repo_dependencies:
-  - from_context: <id>
-    to_context: <id>
-    relationship: "uses_terms | extends | integrates_with"
-    description: <one-line description>
-```
-
-Cross-repo dependencies are inferred from:
-
-- `dependencies` declared in `context_map.contexts[]`
-- Shared domain names between repositories
-- Explicit integration patterns (e.g., a payment-service consumer for an orders event)
-
----
-
-## Step 5 — Update workspace.md
-
-Update the `generated_at` field in `.velocity/workspace.md` to the current timestamp.
-
-Update `repositories[].last_synced_at` for any repository that was successfully scanned.
-
-Do not change any other fields in `workspace.md` — this is the developer-managed registration file.
-
----
-
-## Step 6 — Generate Workspace Knowledge Base Index
-
-Write `.velocity/knowledge-base/workspace-index.md`:
-
-```markdown
-# Workspace Knowledge Index
-
-Generated: <date>
-
-## Repositories
-
-| Repository | Domain   | Stack     | Contexts       |
-| ---------- | -------- | --------- | -------------- |
-| <name>     | <domain> | <summary> | <context list> |
-
-## Bounded Contexts
-
-| Context | Repository | CONTEXT.md exists | Terms |
-| ------- | ---------- | ----------------- | ----- |
-| <name>  | <repo>     | ✅ / ⚠ missing    | <N>   |
-
-## Cross-Repo Context Dependencies
-
-<list from graph.md cross_repo_dependencies>
-
-## Shared Standards
-
-- Engineering: .velocity/project-context/engineering.md
-- Security: .velocity/project-context/security.md
-- Testing: .velocity/project-context/testing.md
-- API: .velocity/project-context/api.md
-```
-
----
-
-## Step 7 — Report
-
-```
-✅ Workspace Intelligence complete
-
-Workspace: {name}
-Architecture: {style}
-Domains: {list}
-
-Repositories scanned: {N}
-  ✅ Accessible: {N}
-  ⚠ Not accessible (no local cache): {N}
-
-Bounded contexts: {N}
-  ✅ CONTEXT.md present: {N}
-  ⚠ CONTEXT.md missing: {N}
-
-Issues:
-  {list of validation issues, or "None"}
-
-Written:
-  .velocity/workspace-intelligence/graph.md
-  .velocity/knowledge-base/workspace-index.md
-
-Next steps:
-  {context-specific: e.g. "Create CONTEXT.md in payments-service by running /grill-with-docs there"}
-```
-
----
-
-## Delta Mode (for /sync)
-
-When invoked with `--delta`:
-
-1. Read existing `.velocity/workspace-intelligence/graph.md`
-2. Re-scan only repositories whose `last_scanned_at` is older than 7 days or whose `workspace.md` entry has changed since the last scan
-3. Check for new CONTEXT.md files created since last scan
-4. Update graph.md with changed entries only
-5. Regenerate `workspace-index.md`
-6. Report: what changed, what was skipped (current)
+</workspace-intelligence>

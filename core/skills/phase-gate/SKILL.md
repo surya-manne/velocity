@@ -1,180 +1,103 @@
 ---
 name: phase-gate
-description: >-
-  Phase exit evaluation. Runs automated checks (feedback-loop, guardrails) or
-  presents artifacts to the developer for human approval using the fixed gate
-  schema. Advances pipeline state on approval. Records revision requests on
-  rejection. Handles phase skips with justification. Invoke when a phase
-  completes or when a developer wants to skip a phase.
-metadata:
-  surfaces:
-    - agent
+description: "Manages the full phase lifecycle: runs a pre-phase interview to surface assumptions before execution, then evaluates exit criteria at completion via automated checks or human approval, advancing or holding the pipeline accordingly."
+mode: subagent
+readonly: false
+tags: ["skill", "phase-gate", "pipeline", "interview", "gate"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Phase Gate
+<phase-gate>
 
-Evaluate exit criteria and advance (or hold) the pipeline at phase completion.
+<role>
 
-## Context Load
+You are a phase lifecycle manager that interviews agents before execution and evaluates exit criteria at phase completion.
 
-Read before starting:
+</role>
 
-1. `.velocity/sdlc/state/<work-id>.yaml` on the `velocity-state` branch — current phase, gate type, existing artifacts
-2. `.velocity/sdlc/pipeline.yaml` — phase definition: `gate_type`, `exit_artifact`, next phase
-3. `.velocity/guardrails/default.md` — automated gate thresholds (if present)
+<purpose>
 
----
+Problem: Agents begin execution without surfacing assumptions, and phase completion has no consistent exit evaluation — causing rework and missed quality gates.
 
-## When to Run
+Solution: Run a structured interview at phase start and a gate evaluation at phase completion, with automated checks and human approval as configured.
 
-Run this skill when:
+Validation: The phase interview produces confirmed context or flagged assumptions before execution; the gate produces an approved state advancement or a tracked revision request.
 
-- The owning agent signals the current phase is complete.
-- A developer explicitly wants to skip a phase.
-- The loop skill advances a pipeline to its gate step.
+</purpose>
 
----
+<prerequisites>
 
-## Step 1 — Read Gate Type
+- `.velocity/sdlc/state/<work-id>.yaml` on the `velocity-state` branch — current phase, prior phase artifacts, recorded assumptions
+- `.velocity/artifacts/context/CONTEXT.md` — active domain language and bounded context
+- Artifacts from all `approved` phases
+- `.velocity/sdlc/pipeline.yaml` — phase definition for the current phase
+- `.velocity/guardrails/default.md` — automated gate thresholds (if present)
 
-From `pipeline.yaml`, read `gate_type` for the current phase:
+</prerequisites>
 
-| gate_type | Path |
-|-----------|------|
-| `automated` | Go to Step 2 (Automated Gate) |
-| `human` | Go to Step 3 (Human Gate) |
-| `both` | Run Step 2 first; if automated passes, run Step 3 |
+<process>
 
----
+## Part 1 — Phase Interview (run at phase start)
 
-## Step 2 — Automated Gate
+Run **once per phase**, before any execution work begins.
 
-Run the following checks in order. Stop on first failure.
-
-### 2a. Typecheck
-
-Invoke `/feedback-loop` typecheck gate.  
-Read typecheck command from `.velocity/project-context/testing.md`.  
-Pass condition: exit code 0.
-
-### 2b. Test Suite
-
-Invoke `/feedback-loop` test gate.  
-Run full test suite. Pass condition: exit code 0 and coverage ≥ threshold in `guardrails/default.md`.
-
-### 2c. Guardrail Check
-
-Invoke `/validate`.  
-Check: CONTEXT.md term consistency, slice completeness, security gates.  
-Pass condition: no blocking violations.
-
-### 2d. Automated Gate Result
-
-**All checks pass:**
-- Update state file: `phases.<phase-id>.gate.type: automated`, `gate.automated_checks: {typecheck: pass, tests: pass, guardrails: pass}`, `gate.approved_by: automated`, `gate.approved_at: <now>`
-- If `gate_type` is `automated`: advance `current_phase` to the next phase, set new phase `status: in_progress`.
-- If `gate_type` is `both`: proceed to Step 3 (Human Gate).
-- Commit: `feat(sdlc): automated gate passed for <work-id>/<phase-id>`
-
-**Any check fails:**
-- Log failures in state: `phases.<phase-id>.gate.automated_checks: {<check>: fail}`
-- Do NOT advance the phase.
-- Present specific failures with remediation to the developer.
-- Phase status stays `in_progress` until the agent fixes and re-runs.
+1. **Determine current phase.** Read `current_phase` from state file. If `status: pending`, update to `in_progress` and set `started_at: <now>`.
+2. **Generate questions** fresh from context — no static bank. Max 5, MECE, high-impact only. Priority: P1 scope blockers (1–2), P2 security/privacy flags (0–1), P3 UX/impact if ambiguous (0–1), P4 technical detail if necessary (0–1). If no P1 questions exist, skip to fast path.
+3. **Present interview** as: agent name, phase name, one-sentence statement of what this phase produces, up to 5 questions with recommended answers. **Fast path**: if no questions, state assumed context in one line and proceed immediately.
+4. **Process answers.** Confirmed answers: record as confirmed context. Skipped/unanswered: record recommended answer as `⚠ Assumption (unanswered): [question] → defaulted to: [recommended]`.
+5. **Record assumptions.** If any: write to `.velocity/artifacts/<artifact-dir>/<work-id>-<phase-id>-assumptions.md`; append to `phases.<current-phase>.assumptions[]` in state file; commit: `chore(sdlc): record phase-interview assumptions for <work-id>/<phase-id>`.
+6. Signal to owning agent that interview is complete and execution may begin.
 
 ---
 
-## Step 3 — Human Gate
+## Part 2 — Phase Gate (run at phase completion)
 
-Present the phase output to the developer using the fixed presentation schema.
+Triggered when: owning agent signals phase complete, developer wants to skip a phase, or loop skill advances to gate step.
 
-### 3a. Collect Artifacts
+**Read `gate_type`** from `pipeline.yaml` for the current phase: `automated`, `human`, or `both`.
 
-Read `phases.<phase-id>.artifacts` from the state file.  
-Read any flagged assumptions from `phases.<phase-id>.assumptions`.
+### Automated Gate (gate_type: `automated` or `both`)
 
-### 3b. Present Gate
+- USE SKILL `feedback-loop` for typecheck (exit code 0) and test suite (exit code 0, coverage ≥ threshold in `guardrails/default.md`).
+- USE SKILL `validate` for CONTEXT.md term consistency, slice completeness, security gates.
+- **All pass:** update state gate fields (`type`, `automated_checks`, `approved_by: automated`, `approved_at`); advance `current_phase` if type is `automated`; proceed to human gate if `both`; commit: `feat(sdlc): automated gate passed for <work-id>/<phase-id>`.
+- **Any fail:** log failures in state; do not advance; present specific failures with remediation; phase stays `in_progress`.
 
-```markdown
-## Phase Complete: [Phase Name]
+### Human Gate (gate_type: `human` or `both` after automated passes)
 
-**What was produced:**
-- [Artifact 1 — one-line description]
-- [Artifact 2 — one-line description]
-[... list all artifacts from phases.<phase-id>.artifacts]
+Collect `phases.<phase-id>.artifacts` and `assumptions`. Present: artifact list, key decisions, flagged assumptions, what approval covers, next phase + owning agent, revision instructions.
 
-**Key decisions made:**
-- [Decision 1 with brief rationale]
-- [Decision 2 with brief rationale]
+- **Approval**: set `status: approved`, `completed_at`, gate fields (`type: human`, `approved_by: human`, `approved_at`); advance `current_phase`; commit: `feat(sdlc): human gate approved for <work-id>/<phase-id>`. Confirm: "Approved. Moving to [next phase name]."
+- **Revision**: record `revision_request` in state; set `status: requires-revision`; agent revises and re-presents. If revision count ≥ `max_revision_attempts` from `pipeline-config.yaml`: stop and escalate.
 
-⚠ **Assumptions flagged during phase interview:**
-[List each flagged assumption, or "None" if clean]
+### Phase Skip (invoked with `--skip "<justification>"`)
 
-**What I'm asking you to approve:**
-[Clear one-sentence statement of what human approval covers for this phase]
-
-**What happens next if you approve:**
-Next phase: **[next phase name]**
-Owning agent: [owning agent]
-
-**If you want changes:**
-Tell me what to revise. I'll update the artifacts and re-present.
-Max [N] revision cycles before escalation.
-```
-
-### 3c. Handle Developer Response
-
-**Approval** (developer says yes / approves / LGTM):
-- Update state file:
-  - `phases.<phase-id>.status: approved`
-  - `phases.<phase-id>.completed_at: <now>`
-  - `phases.<phase-id>.gate.type: human`
-  - `phases.<phase-id>.gate.approved_by: human`
-  - `phases.<phase-id>.gate.approved_at: <now>`
-- Advance `current_phase` to next phase; set new phase `status: in_progress`.
-- Commit: `feat(sdlc): human gate approved for <work-id>/<phase-id>`
-- Confirm to developer: "Approved. Moving to **[next phase name]**."
-
-**Revision request** (developer provides feedback):
-- Record in state: `phases.<phase-id>.revision_request: "<developer feedback>"`
-- Phase status stays `requires-revision`.
-- Agent revises artifacts and re-runs Step 3b.
-- Track revision count. If count ≥ `max_revision_attempts` from `pipeline-config.yaml`: stop and escalate — "We've reached the revision limit. Please review manually and tell me how to proceed."
-
----
-
-## Step 4 — Phase Skip
-
-When invoked with `--skip "<justification>"`:
-
-1. Confirm `skippable: true` in pipeline.yaml for this phase. If `skippable: false`: reject skip — "This phase cannot be skipped. It is required by the pipeline definition."
-
-2. Update state file:
-   - `phases.<phase-id>.status: skipped`
-   - `phases.<phase-id>.skip_reason: "<justification>"`
-   - `phases.<phase-id>.completed_at: <now>`
-
-3. Advance `current_phase` to next phase.
-
-4. Commit: `feat(sdlc): phase <phase-id> skipped for <work-id> — <justification>`
-
-5. Surface the skip at the next human gate:
-
-```markdown
-⚠ **Skipped phase:** [phase name]
-**Reason:** [justification]
-```
+1. Confirm `skippable: true` in `pipeline.yaml`; reject if false.
+2. Set `status: skipped`, `skip_reason`, `completed_at`; advance `current_phase`; commit: `feat(sdlc): phase <phase-id> skipped for <work-id>`.
+3. Surface the skip at the next human gate.
 
 ---
 
 ## State File Update Pattern
 
-All state mutations follow this pattern:
+All state mutations: `git fetch origin velocity-state` → `git checkout velocity-state` → edit `.velocity/sdlc/state/<work-id>.yaml` → `git add` + `git commit` + `git push origin velocity-state` → `git checkout -`. Never leave `velocity-state` checked out after update.
 
-1. `git fetch origin velocity-state`
-2. `git checkout velocity-state`
-3. Edit `.velocity/sdlc/state/<work-id>.yaml`
-4. `git add` + `git commit` + `git push origin velocity-state`
-5. `git checkout -` (return to feature branch)
+</process>
 
-Do not leave the `velocity-state` branch checked out after update.
+<pitfalls>
+
+- Asking more than 5 questions per phase — stick to MECE, high-impact questions only
+- Proceeding with phase execution before the interview is complete and answered
+- Not recording flagged assumptions from unanswered interview questions to the state file
+- Leaving the `velocity-state` branch checked out after a state mutation
+
+</pitfalls>
+
+<skills_available>
+
+- USE SKILL `feedback-loop` for typecheck and test gate checks in the automated gate
+- USE SKILL `validate` for the guardrail check in the automated gate
+
+</skills_available>
+
+</phase-gate>

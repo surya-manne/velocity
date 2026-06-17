@@ -1,271 +1,84 @@
 ---
 name: project-intelligence
-description: >-
-  Fingerprint the technology stack of this repository from source files.
-  Reads package manifests, config files, and directory structure to detect
-  languages, frameworks, patterns, and bounded contexts. Outputs stack.md.
-  Run automatically by /init and /sync; invoke manually to refresh.
-metadata:
-  surfaces:
-    - agent
+description: "Fingerprint the technology stack of a repository from source files and output stack.md conforming to the project-intelligence schema. Full skill."
+mode: subagent
+model: Claude Opus 4.8
+readonly: false
+tags: ["skill", "project-intelligence", "stack", "fingerprint"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Project Intelligence — Stack Fingerprinting
+<project-intelligence>
 
-Analyze this repository and produce a technology stack fingerprint.
+<role>
 
-## Output
+You are a technology stack fingerprinter who reads repository source files, manifests, and config to produce a structured stack profile.
 
-Write `.velocity/project-intelligence/stack.md` conforming to `schemas/project-intelligence.schema.json`.
+</role>
 
----
+<purpose>
 
-## Fingerprinting Protocol
+Problem: Agents and skills operate without awareness of the project's actual technology stack, leading to wrong framework assumptions and misconfigured outputs.
 
-### Phase 1 — Inventory
+Solution: Run a 12-phase fingerprinting protocol across manifest files, config, source directories, and CI/CD to detect languages, frameworks, patterns, persistence, messaging, API style, and bounded contexts.
 
-List all files in the repository root and scan these locations:
+Validation: `.velocity/project-intelligence/stack.md` is written, conforms to `schemas/project-intelligence.schema.json`, includes a confidence score, and lists all signals used.
 
-```
-Root:          package.json, pom.xml, go.mod, Cargo.toml, requirements.txt,
-               Gemfile, composer.json, pyproject.toml, build.gradle, build.sbt,
-               tsconfig.json, .nvmrc, .python-version, .ruby-version
+</purpose>
 
-Config:        docker-compose.yml, Dockerfile, .env.example
-               kubernetes/, helm/, terraform/, pulumi/
+<prerequisites>
 
-CI/CD:         .github/workflows/*.yml, .gitlab-ci.yml, .circleci/config.yml,
-               Jenkinsfile, .buildkite/pipeline.yml, bitbucket-pipelines.yml
+- Access to the repository root and all sub-directories
+- Run automatically by /init and /sync; invoke manually to refresh
+- For /sync: use `--delta` flag to run in delta mode (see Notes)
 
-Source dirs:   src/, app/, lib/, pkg/, internal/, cmd/, server/, client/,
-               frontend/, backend/, api/, web/, mobile/
+</prerequisites>
 
-Mono/multi:    apps/*, services/*, packages/*, modules/*, domains/*
-```
+<process>
 
-### Phase 2 — Language Detection
+Run these detection phases, then write the output. Each phase maps `signal → value`.
 
-| Signal                                 | Language                |
-| -------------------------------------- | ----------------------- |
-| `package.json` present                 | JavaScript / TypeScript |
-| `tsconfig.json` present                | TypeScript (primary)    |
-| `pom.xml` or `build.gradle`            | Java / Kotlin           |
-| `go.mod`                               | Go                      |
-| `requirements.txt` or `pyproject.toml` | Python                  |
-| `Gemfile`                              | Ruby                    |
-| `Cargo.toml`                           | Rust                    |
-| `composer.json`                        | PHP                     |
-| `*.cs` files, `.csproj`                | C# / .NET               |
+1. **Inventory.** List repo-root files and scan: manifests (`package.json`, `pom.xml`, `go.mod`, `Cargo.toml`, `requirements.txt`, `Gemfile`, `composer.json`, `pyproject.toml`, `build.gradle`, `build.sbt`, `tsconfig.json`, version files); config (`docker-compose.yml`, `Dockerfile`, `.env.example`, `kubernetes/`, `helm/`, `terraform/`, `pulumi/`); CI/CD (`.github/workflows/`, `.gitlab-ci.yml`, `.circleci/`, `Jenkinsfile`, `.buildkite/`, `bitbucket-pipelines.yml`); source dirs (`src/`, `app/`, `lib/`, `pkg/`, `internal/`, `cmd/`, `server/`, `client/`, `frontend/`, `backend/`, `api/`, `web/`, `mobile/`); mono/multi (`apps/*`, `services/*`, `packages/*`, `modules/*`, `domains/*`).
 
-### Phase 3 — Frontend Framework Detection
+2. **Language.** `package.json` → JS/TS; `tsconfig.json` → TypeScript; `pom.xml`/`build.gradle` → Java/Kotlin; `go.mod` → Go; `requirements.txt`/`pyproject.toml` → Python; `Gemfile` → Ruby; `Cargo.toml` → Rust; `composer.json` → PHP; `.csproj`/`*.cs` → C#/.NET.
 
-Scan `package.json` dependencies and `devDependencies`:
+3. **Frontend** (from `package.json` deps): `react`/`react-dom` → React; `next` → Next.js; `vue` → Vue; `@angular/core` → Angular; `svelte` → Svelte; `@solidjs/core` → SolidJS; `nuxt` → Nuxt; `remix` → Remix; `astro` → Astro. UI: `@mui/material` → MUI, `antd` → Ant, `@shadcn/ui` → shadcn, `tailwindcss` → Tailwind, `@chakra-ui/react` → Chakra. State: `@reduxjs/toolkit`/`redux` → Redux, plus `zustand`, `jotai`, `recoil`, `mobx`, `@tanstack/query` → TanStack Query, `swr`.
 
-| Dependency           | Framework           |
-| -------------------- | ------------------- |
-| `react`, `react-dom` | React               |
-| `next`               | Next.js (React SSR) |
-| `vue`                | Vue.js              |
-| `@angular/core`      | Angular             |
-| `svelte`             | Svelte              |
-| `@solidjs/core`      | SolidJS             |
-| `nuxt`               | Nuxt (Vue SSR)      |
-| `remix`              | Remix (React)       |
-| `astro`              | Astro               |
+4. **Backend.** Java/Kotlin: `spring-boot-starter-*` → Spring Boot, `quarkus-*` → Quarkus, `micronaut-*` → Micronaut. Go: `gin-gonic/gin` → Gin, `labstack/echo` → Echo, `gofiber/fiber` → Fiber, `go-chi/chi` → Chi. Node: `@nestjs/core` → NestJS, `express` → Express, `fastify` → Fastify, `hapi` → Hapi. Python: `django` → Django, `fastapi` → FastAPI, `flask` → Flask. Ruby: `rails` → Rails.
 
-UI library detection: `@mui/material` (MUI), `antd` (Ant Design), `@shadcn/ui` (shadcn), `tailwindcss`, `@chakra-ui/react`.
+5. **Persistence.** `pg`/Hibernate-postgres → PostgreSQL; `mysql2`/Spring Data MySQL → MySQL; `mongoose`/`mongodb` → MongoDB; `@aws-sdk/client-dynamodb` → DynamoDB; `redis`/`ioredis` → Redis; `better-sqlite3`/`sqlite3` → SQLite. ORMs: `@prisma/client` → Prisma, `drizzle-orm` → Drizzle, `typeorm` → TypeORM, Spring Data JPA → JPA/Hibernate, `SQLAlchemy` → SQLAlchemy.
 
-State management: `redux`, `@reduxjs/toolkit`, `zustand`, `jotai`, `recoil`, `mobx`, `@tanstack/query`, `swr`.
+6. **Messaging.** `kafkajs`/`spring-kafka`/`confluent-kafka-python` → Kafka; `amqplib`/`spring-rabbit` → RabbitMQ; `@aws-sdk/client-sqs` → SQS; `@google-cloud/pubsub` → Pub/Sub; `nats` → NATS; Bull/BullMQ → Redis queues. Flag event-driven when a broker is present AND files named `*Producer*`/`*Consumer*`/`*Event*`/`*EventHandler*` exist.
 
-### Phase 4 — Backend Framework Detection
+7. **API style.** `graphql`/`@apollo/server`/`type-graphql` → GraphQL; `@grpc/grpc-js`/grpc-java → gRPC; `@trpc/server` → tRPC; HTTP-annotated controllers → REST; both GraphQL and REST → mixed.
 
-Java/Kotlin `pom.xml` / `build.gradle`:
+8. **Architecture pattern** (from dirs + naming): DDD (`domain/`, `aggregate/`, `valueobject/`; `*Aggregate*`/`*Repository*`/`*DomainEvent*`); Event Sourcing (`events/`, `eventstore/`, `projections/`; `*EventStore*`/`*Projection*`); CQRS (`commands/`, `queries/`, `handlers/`; `*Command*`/`*Query*`/`*Handler*`); Hexagonal (`ports/`, `adapters/`, `application/`, `infrastructure/`); Microservices (multiple service definitions / independent manifests / multi-service k8s manifests).
 
-- `spring-boot-starter-*` → Spring Boot
-- `quarkus-*` → Quarkus
-- `micronaut-*` → Micronaut
+9. **Test framework.** `jest` → Jest; `vitest` → Vitest; `mocha`/`chai` → Mocha/Chai; `junit-jupiter` → JUnit 5; `junit` → JUnit 4; `pytest` → pytest; `rspec-rails` → RSpec; Go `testing` → Go testing; `@playwright/test` → Playwright (E2E); `cypress` → Cypress (E2E).
 
-Go `go.mod`:
+10. **Monorepo** (2+ signals = high confidence): `pnpm-workspace.yaml` → pnpm; `turbo.json` → Turborepo; `nx.json` → Nx; `lerna.json` → Lerna; `workspaces` key → npm/yarn; multiple `pom.xml` w/ parent → Maven multi-module; `settings.gradle` `include` → Gradle multi-project. If detected, enumerate `apps/`/`services/`/`packages/` as module candidates.
 
-- `github.com/gin-gonic/gin` → Gin
-- `github.com/labstack/echo` → Echo
-- `github.com/gofiber/fiber` → Fiber
-- `github.com/go-chi/chi` → Chi
+11. **Bounded contexts.** Derive from: explicit service dirs (`services/<name>/`, `apps/<name>/`); package namespaces (`com.acme.payments.*`, `src/payments/`); API route namespaces (`/api/v1/payments/`); DB schema names from migrations; Kafka topic prefixes (`payments.*`). Record each as `id` (kebab-case), `name` (PascalCase), `paths`, `evidence`.
 
-Node.js `package.json`:
+12. **CI/CD.** `.github/workflows/` → GitHub Actions; `.gitlab-ci.yml` → GitLab CI; `.circleci/config.yml` → CircleCI; `Jenkinsfile` → Jenkins; `.buildkite/` → Buildkite.
 
-- `@nestjs/core` → NestJS
-- `express` → Express
-- `fastify` → Fastify
-- `hapi` → Hapi
+13. **Write output.** Populate `.velocity/project-intelligence/stack.md` per `schemas/project-intelligence.schema.json`. Omit undetected fields (never write `null`/empty). Record `signals_used` (every contributing file/dir pattern). Set `confidence`: 0.9+ for 5+ strong signals, 0.7–0.89 for 3–4, 0.5–0.69 for 1–2, <0.5 for weak only. Set `detected_at` to the current ISO-8601 timestamp.
 
-Python:
+</process>
 
-- `django` → Django
-- `fastapi` → FastAPI
-- `flask` → Flask
+<pitfalls>
 
-Ruby:
+- Writing `null` or empty strings for undetected fields instead of omitting them
+- Assigning high confidence when fewer than 3 strong signals were found
+- Missing monorepo detection — treating sub-packages as the entire repository
+- Failing to record `signals_used` — required for delta mode to detect changes
 
-- `rails` → Rails
+</pitfalls>
 
-### Phase 5 — Persistence Detection
+<notes>
 
-Scan all manifest files for ORM and database driver dependencies:
+**Delta Mode (for /sync):** When invoked with `--delta`: (1) read existing `.velocity/project-intelligence/stack.md`, (2) re-read all source files, (3) identify changed signals only, (4) output `stack-delta.md` with only changed/added/removed fields, (5) the caller (sync skill) merges delta into `stack.md`. Delta mode avoids regenerating unchanged agent and skill configs.
 
-| Dependency / Pattern                                          | Persistence   |
-| ------------------------------------------------------------- | ------------- |
-| `pg`, `@prisma/client` (postgres adapter), Hibernate postgres | PostgreSQL    |
-| `mysql2`, Spring Data MySQL                                   | MySQL         |
-| `mongoose`, `mongodb`                                         | MongoDB       |
-| `@aws-sdk/client-dynamodb`                                    | DynamoDB      |
-| `redis`, `ioredis`                                            | Redis         |
-| `better-sqlite3`, `sqlite3`                                   | SQLite        |
-| `@prisma/client`                                              | Prisma ORM    |
-| `drizzle-orm`                                                 | Drizzle ORM   |
-| `typeorm`                                                     | TypeORM       |
-| Spring Data JPA                                               | JPA/Hibernate |
-| SQLAlchemy                                                    | SQLAlchemy    |
+</notes>
 
-### Phase 6 — Messaging Detection
-
-| Dependency / Config                                 | Messaging           |
-| --------------------------------------------------- | ------------------- |
-| `kafkajs`, `spring-kafka`, `confluent-kafka-python` | Apache Kafka        |
-| `amqplib`, `spring-rabbit`                          | RabbitMQ            |
-| `@aws-sdk/client-sqs`                               | Amazon SQS          |
-| `@google-cloud/pubsub`                              | Google Pub/Sub      |
-| `nats`                                              | NATS                |
-| Bull, BullMQ                                        | Redis-backed queues |
-
-Detect event-driven pattern when: Kafka/RabbitMQ present AND files named `*Producer*`, `*Consumer*`, `*Event*`, `*EventHandler*` exist.
-
-### Phase 7 — API Style Detection
-
-| Signal                                                       | API Style |
-| ------------------------------------------------------------ | --------- |
-| `graphql`, `@apollo/server`, `type-graphql`                  | GraphQL   |
-| `@grpc/grpc-js`, grpc-java                                   | gRPC      |
-| `@trpc/server`                                               | tRPC      |
-| REST endpoints in source (controllers with HTTP annotations) | REST      |
-| Both GraphQL and REST present                                | mixed     |
-
-### Phase 8 — Architecture Pattern Detection
-
-Detect these patterns from directory structure and naming conventions:
-
-**DDD:**
-
-- Directories: `domain/`, `aggregate/`, `valueobject/`, `domainservice/`
-- Classes/files: `*Aggregate*`, `*Repository*`, `*DomainEvent*`, `*ValueObject*`
-
-**Event Sourcing:**
-
-- Directories: `events/`, `eventstore/`, `projections/`
-- Classes: `*EventStore*`, `*Projection*`, `*Aggregate*` with event application methods
-
-**CQRS:**
-
-- Directories: `commands/`, `queries/`, `handlers/`
-- Classes: `*Command*`, `*Query*`, `*CommandHandler*`, `*QueryHandler*`
-
-**Hexagonal / Ports & Adapters:**
-
-- Directories: `ports/`, `adapters/`, `application/`, `infrastructure/`
-
-**Microservices:**
-
-- Multiple `docker-compose.yml` service definitions
-- Multiple independent `package.json` / `pom.xml` at service level
-- Kubernetes manifests for multiple services
-
-### Phase 9 — Test Framework Detection
-
-| Dependency                      | Test Framework   |
-| ------------------------------- | ---------------- |
-| `jest`, `@jest/globals`         | Jest             |
-| `vitest`                        | Vitest           |
-| `mocha`, `chai`                 | Mocha/Chai       |
-| JUnit 5 (`junit-jupiter`)       | JUnit 5          |
-| JUnit 4 (`junit`)               | JUnit 4          |
-| `pytest`                        | pytest           |
-| RSpec (`rspec-rails`)           | RSpec            |
-| Go `testing` package            | Go testing       |
-| Playwright (`@playwright/test`) | Playwright (E2E) |
-| Cypress                         | Cypress (E2E)    |
-
-### Phase 10 — Monorepo Detection
-
-Monorepo indicators (high confidence if 2+ present):
-
-| Signal                                      | Tool                 |
-| ------------------------------------------- | -------------------- |
-| `pnpm-workspace.md`                         | pnpm workspaces      |
-| `turbo.json`                                | Turborepo            |
-| `nx.json`                                   | Nx                   |
-| `lerna.json`                                | Lerna                |
-| `workspaces` key in root `package.json`     | npm/yarn workspaces  |
-| Multiple `pom.xml` with parent POM          | Maven multi-module   |
-| `settings.gradle` with `include` directives | Gradle multi-project |
-
-If monorepo detected: enumerate `apps/`, `services/`, `packages/` directories as separate module candidates.
-
-### Phase 11 — Bounded Context Detection
-
-Derive bounded contexts from:
-
-1. **Explicit service directories**: `services/<name>/`, `apps/<name>/`, `modules/<name>/`
-2. **Package/module namespaces**: `com.acme.payments.*`, `src/payments/`, `lib/billing/`
-3. **API route namespaces**: `/api/v1/payments/`, `/api/v1/orders/`
-4. **Database schema names**: detected from migration files
-5. **Kafka topic prefixes**: `payments.*`, `orders.*`
-
-For each detected context, record:
-
-- `id`: kebab-case version of the name
-- `name`: PascalCase display name
-- `paths`: directories associated with this context
-- `evidence`: how it was detected (e.g., "directory: services/payments/")
-
-### Phase 12 — CI/CD Detection
-
-Detect CI/CD platform from:
-
-- `.github/workflows/` → GitHub Actions
-- `.gitlab-ci.yml` → GitLab CI
-- `.circleci/config.yml` → CircleCI
-- `Jenkinsfile` → Jenkins
-- `.buildkite/` → Buildkite
-
----
-
-## Output Format
-
-Populate all detected fields in `.velocity/project-intelligence/stack.md`.
-
-For undetected fields: omit the field (do not write `null` or empty strings).
-
-Record `signals_used` as a list of every file and directory pattern that contributed to the fingerprint.
-
-Set `confidence` to:
-
-- `0.9+` if 5+ strong signals detected
-- `0.7–0.89` if 3–4 signals detected
-- `0.5–0.69` if 1–2 signals detected
-- `< 0.5` if only weak signals (note which fields are uncertain)
-
-Set `detected_at` to current ISO 8601 timestamp.
-
----
-
-## Delta Mode (for /sync)
-
-When invoked with `--delta` (from `/sync`):
-
-1. Read existing `.velocity/project-intelligence/stack.md`
-2. Re-read all source files
-3. Identify changed signals only
-4. Output: a `stack-delta.md` with only changed/added/removed fields
-5. The caller (sync skill) merges delta into `stack.md`
-
-Delta mode avoids regenerating unchanged agent and skill configs.
+</project-intelligence>

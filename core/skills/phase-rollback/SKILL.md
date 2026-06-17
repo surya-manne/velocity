@@ -1,156 +1,100 @@
 ---
 name: phase-rollback
-description: >-
-  Revert pipeline state to a prior phase when a later phase reveals a problem
-  in earlier work. Marks the target phase as requires-revision, resets
-  current_phase, and pre-loads rollback context for the agent that re-runs
-  the phase. Only the target phase and downstream phases that depended on it
-  are affected — unrelated phases are preserved. Invoke when an agent detects
-  that an earlier phase artifact is incorrect.
-metadata:
-  surfaces:
-    - agent
+description: "Reverts an in-progress pipeline to an earlier phase for revision, marking the target and dependent downstream phases as requires-revision while preserving unrelated approved phases."
+mode: subagent
+readonly: false
+tags: ["skill", "phase-rollback", "pipeline", "rollback", "revision"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Phase Rollback
+<phase-rollback>
 
-Revert an in-progress pipeline to an earlier phase for revision.
+<role>
 
-## Context Load
+You are a pipeline rollback coordinator that reverts in-progress pipelines to an earlier phase for revision.
 
-Read before starting:
+</role>
 
-1. `.velocity/sdlc/state/<work-id>.yaml` on the `velocity-state` branch — full phase history, artifacts, gate records
-2. `.velocity/sdlc/pipeline.yaml` — phase sequence for this pipeline variant
+<purpose>
 
----
+Problem: A later phase may reveal that an earlier approved phase artifact is incorrect, but no structured mechanism exists to safely revert state and re-execute without discarding unrelated progress.
 
-## When to Use
+Solution: Identify the rollback target, assess downstream impact with developer confirmation, apply state changes with full history, and hand off clear revision context to the owning agent.
 
-Use this skill when:
+Validation: The target phase and dependent downstream phases are marked `requires-revision`; `current_phase` is reset; `rollback_history` is appended and committed to `velocity-state`.
 
-- An agent executing a later phase detects that an earlier phase artifact is wrong (e.g., a CONTEXT.md term used throughout is incorrect, a root cause diagnosis was incomplete, an architectural decision in Design is invalidated by Build findings).
-- A developer explicitly asks to re-open an earlier phase.
+</purpose>
 
-Do **not** use this skill to:
+<prerequisites>
 
-- Skip a phase (use `phase-gate --skip` instead).
-- Discard all progress and restart (create a new work item instead).
+- `.velocity/sdlc/state/<work-id>.yaml` on the `velocity-state` branch — full phase history, artifacts, gate records
+- `.velocity/sdlc/pipeline.yaml` — phase sequence for this pipeline variant
 
----
+</prerequisites>
 
-## Step 1 — Identify Rollback Target
+<process>
 
-Determine the `target_phase_id` — the earliest phase that needs revision.
+**When to use:** a later-phase agent detects an earlier phase artifact is wrong, or a developer explicitly asks to re-open an earlier phase. Do not use to skip a phase (`phase-gate --skip`) or discard all progress (create a new work item).
 
-If invoked by an agent: the agent states which phase needs revision and why.
+### Step 1 — Identify Rollback Target
 
-If invoked manually: ask the developer:
+Determine `target_phase_id`. If invoked by an agent, the agent states the phase and reason. If invoked manually, ask the developer to select from phases with `status: approved` and provide a brief reason. `target_phase_id` must have `status: approved` or `status: gate-pending`; reject `pending` or `skipped` phases.
 
-```
-Which phase needs to be revised?
-[List all phases with status=approved from the state file]
+### Step 2 — Assess Downstream Impact
 
-What is wrong? (brief description)
-```
-
-Validate: `target_phase_id` must have `status: approved` or `status: gate-pending`. You cannot roll back a `pending` phase (it hasn't run yet) or a `skipped` phase.
-
----
-
-## Step 2 — Assess Downstream Impact
-
-From the pipeline variant's phase sequence, identify all phases that come **after** `target_phase_id`.
-
-Classify each downstream phase:
+From the pipeline phase sequence, classify each phase after `target_phase_id`:
 
 | Phase status | Rollback action |
-|-------------|----------------|
-| `approved` | Mark `requires-revision` if its artifacts depend on the target phase |
+|---|---|
+| `approved` | Mark `requires-revision` if artifacts depend on target phase |
 | `gate-pending` | Mark `requires-revision` |
 | `in_progress` | Mark `requires-revision`; halt current execution |
-| `pending` | Leave unchanged — it hasn't run yet |
+| `pending` | Leave unchanged |
 | `skipped` | Leave unchanged |
 
-**Dependency rule:** A downstream phase depends on the target phase if it lists artifacts from the target phase in its own `artifacts` array, or if it is the immediately following phase. When in doubt, mark it `requires-revision`.
+**Dependency rule:** a downstream phase depends on the target if it lists target artifacts in its own `artifacts` array, or is the immediately following phase. When in doubt, mark `requires-revision`.
 
-Present the impact assessment to the developer before making any changes:
+Present impact summary (phases affected, phases preserved) and wait for explicit developer confirmation before proceeding.
 
-```markdown
-## Rollback Impact Assessment
+### Step 3 — Apply Rollback
 
-**Rolling back:** [target phase name]
-**Reason:** [reason provided]
+After confirmation:
 
-**Phases affected:**
-- [target phase] → requires-revision
-- [downstream phase 1] → requires-revision (depends on target artifacts)
-- [downstream phase 2] → untouched (no dependency on target)
-
-**What will be preserved:**
-- [unaffected phases] remain approved
-
-Confirm rollback? (yes / cancel)
-```
-
-Wait for explicit confirmation before proceeding.
-
----
-
-## Step 3 — Apply Rollback
-
-After developer confirms:
-
-1. Update `phases.<target-phase>.status: requires-revision`
-2. Update `phases.<target-phase>.revision_context: "<reason for rollback>"`
-3. For each dependent downstream phase: update `status: requires-revision`
-4. Set `current_phase: <target-phase-id>`
-5. Record rollback in a `rollback_history` array on the state file (append, do not overwrite):
+1. Set `phases.<target-phase>.status: requires-revision` and `revision_context: "<reason>"`
+2. Set each dependent downstream phase `status: requires-revision`
+3. Set `current_phase: <target-phase-id>`
+4. Append to `rollback_history` (append-only — never delete records):
    ```yaml
-   rollback_history:
-     - rolled_back_at: <ISO timestamp>
-       target_phase: <target-phase-id>
-       reason: <reason>
-       triggered_by: <agent-name or human>
-       phases_reset: [<list of phase ids marked requires-revision>]
+   - rolled_back_at: <ISO timestamp>
+     target_phase: <target-phase-id>
+     reason: <reason>
+     triggered_by: <agent-name or human>
+     phases_reset: [<phase ids>]
    ```
+5. Commit to `velocity-state`: `feat(sdlc): rollback to <target-phase-id> for <work-id> — <reason>`
 
-6. Commit to `velocity-state` branch:
-   `feat(sdlc): rollback to <target-phase-id> for <work-id> — <reason>`
+### Step 4 — Hand Off for Re-Execution
 
----
-
-## Step 4 — Hand Off for Re-Execution
-
-After state is updated, brief the owning agent for the target phase:
-
-```markdown
-## Rollback Complete — [target phase name] requires revision
-
-**Work id:** [work_id]
-**Phase to re-run:** [target phase name]
-**Owning agent:** [owning agent]
-
-**Rollback reason:**
-[reason provided]
-
-**Prior phase artifacts (may need updating):**
-[list artifacts from phases.<target-phase>.artifacts]
-
-**What downstream phases were reset:**
-[list phases marked requires-revision]
-
----
-To start the revised phase: run /phase-interview for [target phase name].
-Prior approved phases will be used as context. The agent should focus revision
-on the specific problem identified above.
-```
+Brief the owning agent: work id, phase to re-run, rollback reason, prior artifacts that may need updating, downstream phases reset. Instruct: run `/phase-interview` for the target phase to begin revision. Prior approved phases remain as context.
 
 ---
 
 ## State Consistency Rules
 
-- `rollback_history` is append-only. Never delete rollback records.
-- A phase with `status: requires-revision` cannot be gated as `approved` without re-running and re-presenting at the human gate.
+- `rollback_history` is append-only.
+- A `requires-revision` phase cannot be gated `approved` without re-running and re-presenting at the human gate.
 - The loop skill reads `requires-revision` status and routes accordingly.
-- Do not mark a phase `skipped` as `requires-revision` — skipped phases were intentionally excluded.
+- Do not mark `skipped` phases as `requires-revision`.
+
+</process>
+
+<pitfalls>
+
+- Rolling back a `pending` phase (it hasn't run yet) or a `skipped` phase — both are invalid rollback targets
+- Deleting rollback history records — `rollback_history` is append-only
+- Marking a downstream phase `requires-revision` without confirming it depends on the target phase artifacts
+- Proceeding with rollback before the developer explicitly confirms the impact assessment
+
+</pitfalls>
+
+</phase-rollback>

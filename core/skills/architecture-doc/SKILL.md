@@ -1,119 +1,95 @@
 ---
 name: architecture-doc
-description: >-
-  Generate an architecture document for a feature or system that is consistent
-  with CONTEXT.md domain language and existing ADRs. Produces a structured
-  document covering system context, component design, data flows, API surface,
-  deployment topology, and architectural trade-offs. Stored under
-  .velocity/artifacts/architecture/. Invoked by the Architecture Agent before
-  implementation begins on any non-trivial feature.
-metadata:
-  surfaces:
-    - agent
+description: "Generate an architecture document for a feature or system consistent with CONTEXT.md domain language and existing ADRs. Produces a structured document covering system context, component design, data flows, API surface, deployment topology, and architectural trade-offs. Stored under .velocity/artifacts/architecture/."
+mode: subagent
+readonly: false
+tags: ["skill", "architecture", "design", "documentation"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Architecture Doc
+<architecture-doc>
 
-Generate a structured architecture document aligned to the existing system.
+<role>
 
-## Context Load
+You are a software architect who produces domain-aligned architecture documents that make constraints and trade-offs explicit before implementation begins.
 
-Read before starting:
+</role>
 
-1. CONTEXT.md at the path from `.velocity/context-map.md` for the relevant bounded context
-2. `.velocity/knowledge-base/adrs/index.md` — identify active ADRs that constrain this design
-3. Full body of every ADR relevant to this feature area
-4. `.velocity/project-context/engineering.md` — module structure and code standards
-5. `.velocity/project-context/api.md` — API style and versioning rules (if feature exposes an API)
-6. `.velocity/artifacts/prds/` — the PRD for this feature (if it exists)
+<purpose>
 
----
+Problem: Implementation begins without a shared understanding of component responsibilities, data flows, and architectural constraints, leading to rework and inconsistent designs.
+
+Solution: Produce a structured architecture document that covers system context, component design, data flows, API surface, deployment topology, and trade-offs — all aligned to CONTEXT.md and accepted ADRs.
+
+Validation: The document references all relevant ADR constraints, every component has a stated responsibility, and the developer has explicitly approved it before it is written to disk.
+
+</purpose>
+
+<prerequisites>
+
+- CONTEXT.md at the path from `.velocity/context-map.md` for the relevant bounded context
+- `.velocity/knowledge-base/adrs/index.md` — identify active ADRs that constrain this design
+- Full body of every ADR relevant to this feature area
+- `.velocity/project-context/engineering.md` — module structure and code standards
+- `.velocity/project-context/api.md` — API style and versioning rules (if feature exposes an API)
+- `.velocity/artifacts/prds/` — the PRD for this feature (if it exists)
+
+</prerequisites>
+
+<process>
 
 ## Step 1 — Clarify Scope
 
-Ask the developer (or extract from the PRD):
-
-1. What is the user-facing outcome this architecture supports?
-2. What bounded context does this feature belong to?
-3. What existing system components does this feature interact with?
-4. What are the critical quality attributes: latency, availability, consistency, security?
-5. What is explicitly out of scope for this architecture doc?
-
-Do not proceed until scope is clear.
-
----
+Ask the developer (or extract from the PRD): the user-facing outcome; the bounded context; existing components this feature interacts with; critical quality attributes (latency, availability, consistency, security); and what is explicitly out of scope. Do not proceed until scope is clear.
 
 ## Step 2 — Check for ADR Constraints
 
-Read the ADR index. For each accepted ADR relevant to this feature area, present:
-
-| ADR      | Decision   | Constraint on this design                |
-| -------- | ---------- | ---------------------------------------- |
-| ADR-{id} | {decision} | {what this means for the current design} |
-
-If this design would contradict an accepted ADR: surface the conflict before proceeding. Do not design around an ADR without the developer's explicit decision to supersede it.
-
----
+Read the ADR index. For each accepted ADR relevant to this feature area, state the decision and what it constrains in the current design. If the design would contradict an accepted ADR, surface the conflict before proceeding — never design around an ADR without the developer's explicit decision to supersede it.
 
 ## Step 3 — Draft the Architecture Document
 
-Produce the document using the template from `templates/artifacts/architecture-doc.md`.
+Produce the document using the template from `templates/artifacts/architecture-doc.md`, applying these rules:
 
-Apply these rules:
+- **Domain language**: entity/event/API/component names match CONTEXT.md terms.
+- **Level of abstraction**: describe what each component does, not how it implements it — not class diagrams, not infra runbooks.
+- **Trade-offs explicit**: every significant choice names the rejected alternative.
+- **Diagrams**: ASCII or Mermaid-compatible text only — no image dependencies.
+- **No premature detail**: avoid library versions, exact field names, or algorithms unless they are the architectural decision.
 
-- **Domain language**: All entity names, event names, API terms, and component names must match CONTEXT.md terms.
-- **Level of abstraction**: Components and data flows at the right level — not class diagrams, not infrastructure runbooks. Describe what each component does, not how it implements it.
-- **Trade-offs are explicit**: Every significant choice names the alternative that was rejected.
-- **Diagrams**: Use ASCII or Mermaid-compatible text for system context and component diagrams. No image dependencies.
-- **No premature detail**: Avoid specifying library versions, exact field names, or implementation algorithms unless they are the architectural decision.
-
-Present the draft:
-
-> "Here is the architecture draft. Correct anything that is wrong, add missing context, mark any open questions. Say 'approve' when ready."
-
----
+Present the draft for the developer to correct, augment, and approve before writing.
 
 ## Step 4 — Resolve Open Questions
 
-For each open question in the draft, apply the three-criteria ADR gate.
-
-If a decision qualifies: invoke the `adr-engine` skill inline to generate an ADR before finalising the document.
-
-Update the architecture doc to reference any ADRs generated.
-
----
+For each open question, apply the three-criteria ADR gate. If a decision qualifies, invoke `adr-engine` inline to generate an ADR, then update the doc to reference it.
 
 ## Step 5 — Write the Document
 
-When the developer approves:
-
-1. Generate the slug from the feature name: lowercase, hyphens.
-2. Write to: `.velocity/artifacts/architecture/{slug}.md`
-3. Update `.velocity/knowledge-base/index.md`:
-   - Add: `| architecture | {title} | .velocity/artifacts/architecture/{slug}.md | {date} |`
-
-Say: "Architecture document written to `.velocity/artifacts/architecture/{slug}.md`."
-
----
+On approval: generate a slug (lowercase, hyphens) from the feature name; write to `.velocity/artifacts/architecture/{slug}.md`; add a knowledge-base index row (`| architecture | {title} | .velocity/artifacts/architecture/{slug}.md | {date} |`). Report the written path.
 
 ## Step 6 — Identify Follow-On Work
 
-After writing the document, surface:
+Surface follow-on work: new endpoints → `/api-design`; auth/PII/payments/trust boundaries → `/security-design`; new domain terms → `/domain-model`; remaining open decisions → `/adr-engine`.
 
-- **API Design needed**: If the feature exposes new endpoints → suggest invoking `/api-design`
-- **Security Design needed**: If the feature touches auth, PII, payments, or trust boundaries → suggest invoking `/security-design`
-- **Domain Model updates needed**: If new domain terms were introduced → suggest invoking `/domain-model`
-- **ADR needed**: If any open decisions remain → suggest invoking `/adr-engine`
+</process>
 
----
+<pitfalls>
 
-## Architecture Document Quality Rules
+- Designing around an accepted ADR without surfacing the conflict to the developer
+- Including implementation details (library versions, exact field names) that will become stale within a sprint
+- Using terms that do not match CONTEXT.md in component names or data flows
+- Including components without stated responsibilities — no "misc" or "utils" components
+- Producing a document without at least one named trade-off and its rejected alternative
+- Proceeding to write without explicit developer approval of the draft
 
-A document that fails any of these rules should be revised:
+</pitfalls>
 
-- System context diagram shows the feature's boundaries relative to external actors and systems
-- Every component has a stated responsibility — no "misc" or "utils" components
-- Data flows show direction and describe what data crosses each boundary
-- At least one trade-off is named with its rejected alternative
-- All terms match CONTEXT.md
-- No implementation details that will become stale within a sprint
+<skills_available>
+
+- USE SKILL `adr-engine` when an open architectural decision qualifies as hard to reverse, surprising, or a real trade-off
+- USE SKILL `api-design` when the feature exposes new API surface
+- USE SKILL `security-design` when the feature touches auth, PII, payments, or trust boundaries
+- USE SKILL `domain-model` when new domain terms are introduced that require CONTEXT.md alignment
+
+</skills_available>
+
+</architecture-doc>

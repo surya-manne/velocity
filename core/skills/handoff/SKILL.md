@@ -1,121 +1,63 @@
 ---
 name: handoff
-description: >-
-  Compact context artifact for clean hand-off at the end of each slice.
-  Produces the only context the next session needs — no conversation history
-  required. Write at the end of every slice before closing the context window.
-  The next Engineer Agent picks up the handoff document, not the chat history.
-metadata:
-  surfaces:
-    - agent
+description: "Produce a compact handoff document at the end of a slice so the next session can continue without conversation history. Full skill."
+mode: subagent
+model: Claude Opus 4.8
+readonly: false
+tags: ["skill", "handoff", "context", "continuity"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Handoff
+<handoff>
 
-Compact this slice into a minimal brief for the next session.
+<role>
 
-## Context Load
+You are a slice-completion specialist who compacts exactly what the next session needs into a single handoff document, nothing more.
 
-Read before starting:
+</role>
 
-1. `.velocity/artifacts/tasks/{task-id}.md` — current slice task definition
-2. Test run output (read from recent terminal history)
-3. CONTEXT.md for the relevant bounded context (brief reference)
+<purpose>
 
----
+Problem: Context accumulation across multi-slice work causes AI slop — agents re-read excessive history, drift from the task, and carry stale assumptions into new sessions.
 
-## Purpose
+Solution: At the end of every slice, produce a minimal `.velocity/artifacts/handoffs/{slice-id}.md` that captures what was built, decisions made, test status, out-of-scope items, and the exact starting point for the next session.
 
-Context accumulation is the root cause of AI slop in multi-slice work.
+Validation: The handoff document is self-contained — a fresh agent can read it and start the next slice immediately without access to conversation history or the full codebase.
 
-This skill produces a `.velocity/artifacts/handoffs/{slice-id}.md` that captures exactly what the next session needs to continue — nothing more. The next Engineer Agent reads this document instead of re-reading the full conversation or codebase.
+</purpose>
 
----
+<prerequisites>
 
-## Handoff Document Format
+- Read `.velocity/artifacts/tasks/{task-id}.md` — current slice task definition
+- Read test run output from recent terminal history
+- Read CONTEXT.md for the relevant bounded context (brief reference)
+- Write at the end of every slice before closing the context window
 
-Write to `.velocity/artifacts/handoffs/{slice-id}.md`:
+</prerequisites>
 
-```markdown
-# Handoff: {Slice Name}
+<process>
 
-## Slice ID: {id}
+1. **Write the handoff document** to `.velocity/artifacts/handoffs/{slice-id}.md` using this structure:
+   - `# Handoff: {Slice Name}` with `## Slice ID`, `## Date`, `## Status` (Complete | Partial — reason if partial)
+   - **What Was Built** — 3–5 specific bullet points (e.g., "PaymentService.charge() — validates card, calls Stripe, updates balance")
+   - **What Decisions Were Made** — decisions the next session must know (e.g., "Payments are immutable after settlement — see ADR-012")
+   - **ADRs Generated** — any ADRs created in this session: `ADR-{id}: {Title} — {one-line decision}`
+   - **Test Status** — unit tests (pass | fail | N tests), integration tests (pass | fail | N tests), coverage %, typecheck (pass | fail), lint (pass | fail)
+   - **What Is Out of Scope** — explicitly what was NOT done in this slice (prevents the next agent from re-doing it)
+   - **What the Next Slice Should Start With** — exact starting point: read CONTEXT.md at {path}, first action, context the next agent needs
+   - **Open Issues** — known issues, tech debt, or unresolved questions from this slice
+   - **Files Modified** — created, modified, deleted paths
+2. **Confirm output.** Say: "Handoff written to `.velocity/artifacts/handoffs/{slice-id}.md`. To continue: start a fresh context window, read the handoff document, and proceed from 'What the Next Slice Should Start With'. Do not carry this conversation history into the next session."
 
-## Date: {date}
+</process>
 
-## Status: Complete | Partial — {reason if partial}
+<pitfalls>
 
----
+- Including more context than the next session needs — the handoff must be minimal and focused
+- Omitting out-of-scope items — the next agent will attempt to redo already-complete work
+- Vague "What Was Built" entries — must be specific enough to orient a fresh agent
+- Not including the exact CONTEXT.md path in "What the Next Slice Should Start With"
 
-## What Was Built
+</pitfalls>
 
-{3–5 bullet points of what was implemented in this slice. Specific, concrete.}
-
-- {Specific thing built — e.g., "PaymentService.charge() — validates card, calls Stripe, updates balance"}
-- {Specific thing built}
-- {Specific thing built}
-
-## What Decisions Were Made
-
-{Decisions made during this session that the next session must know.}
-
-- {Decision — e.g., "Payments are immutable after settlement — see ADR-012"}
-- {Decision — e.g., "Used optimistic locking on PaymentAccount to handle concurrent charges"}
-
-## ADRs Generated
-
-{List any ADRs created in this session.}
-
-- ADR-{id}: {Title} — {one-line decision}
-
-## Test Status
-
-- Unit tests: {pass | fail | N tests}
-- Integration tests: {pass | fail | N tests}
-- Coverage: {X%}
-- Typecheck: {pass | fail}
-- Lint: {pass | fail}
-
-## What Is Out of Scope
-
-{Explicitly list what was NOT done in this slice — prevents the next agent from re-doing it.}
-
-- {Out of scope item}
-- {Out of scope item}
-
-## What the Next Slice Should Start With
-
-{The exact starting point for the next session. Specific enough that a fresh agent can start immediately.}
-
-1. Read CONTEXT.md at {path}
-2. {First action — e.g., "Implement PaymentHistoryService.getByAccount() — the query side of the payment model"}
-3. {Context the next agent needs — e.g., "The PaymentAccount entity is in src/payments/domain/PaymentAccount.ts"}
-
-## Open Issues
-
-{Any known issues, tech debt, or unresolved questions from this slice.}
-
-- {Issue — e.g., "Stripe webhook handling is stubbed — needs real implementation in slice 3"}
-
----
-
-## Files Modified
-
-{List of files created or significantly modified in this slice.}
-
-- Created: {path}
-- Modified: {path}
-- Deleted: {path}
-```
-
----
-
-## Completion
-
-After writing the handoff document:
-
-"Handoff written to `.velocity/artifacts/handoffs/{slice-id}.md`."
-
-"To continue: start a fresh context window, read the handoff document, and proceed from 'What the Next Slice Should Start With'."
-
-"Do not carry this conversation history into the next session."
+</handoff>

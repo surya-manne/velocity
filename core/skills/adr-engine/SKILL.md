@@ -1,172 +1,60 @@
 ---
 name: adr-engine
-description: >-
-  Create, version, and index Architecture Decision Records. Applies the
-  three-criteria gate (hard-to-reverse, surprising without context, real
-  trade-off) before drafting. Assigns sequential IDs. Writes ADRs to
-  .velocity/artifacts/adrs/ and updates the knowledge-base index.
-  Invoked by grill-with-docs and domain-model when a qualifying decision
-  is made. Can also be invoked directly to record a decision retroactively.
-metadata:
-  surfaces:
-    - agent
+description: "Create, version, and index Architecture Decision Records with the three-criteria gate. Full skill."
+mode: subagent
+model: Claude Opus 4.8
+readonly: false
+tags: ["skill", "adr", "architecture", "decision-record"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# ADR Engine
+<adr-engine>
 
-Create an Architecture Decision Record for a qualifying decision.
+<role>
 
-## Context Load
+You are an architecture decision-record specialist who qualifies, drafts, versions, and indexes ADRs.
 
-Read before starting:
+</role>
 
-1. `.velocity/knowledge-base/adrs/index.md` — determine the next available ADR ID; understand existing decisions
-2. `.velocity/context-map.md` — identify the relevant bounded context
-3. CONTEXT.md for the relevant context — ensure the ADR uses the established domain language
+<purpose>
 
----
+Problem: Architectural decisions get lost in chat history or go unrecorded, leaving future developers and agents without the reasoning behind code structures.
 
-## Three-Criteria Gate
+Solution: Apply a strict three-criteria gate to qualify decisions, then produce structured ADRs with context, decision, alternatives, and consequences mapped to CONTEXT.md domain language.
 
-Before drafting any ADR, apply the gate. A decision qualifies for an ADR only when **all three criteria** are met:
+Validation: Every ADR has a sequential ID, is indexed, uses established domain language, and passes all ADR quality rules before writing.
 
-**Criterion 1 — Hard to reverse**
-Would undoing this decision require significant rework? (schema migration, API redesign, service split, data re-migration) If the decision is easily changed with no downstream consequences, it does not qualify.
+</purpose>
 
-**Criterion 2 — Surprising without context**
-Would a new developer or AI agent reading the code make a different choice without an explanation? Would the decision look wrong without the reasoning? If the choice is obvious given the stack, it does not qualify.
+<prerequisites>
 
-**Criterion 3 — Real trade-off**
-Did the decision involve weighing options with real consequences on each side? If there was only one reasonable option, it does not qualify.
+- Read `.velocity/knowledge-base/adrs/index.md` — determine the next available ADR ID and understand existing decisions
+- Read `.velocity/context-map.md` — identify the relevant bounded context
+- Read CONTEXT.md for the relevant context — ensure the ADR uses established domain language
 
-### Gate Examples
+</prerequisites>
 
-| Decision                                      | All 3 criteria? | Verdict                                        |
-| --------------------------------------------- | --------------- | ---------------------------------------------- |
-| Payments immutable after settlement           | Yes             | Generate ADR                                   |
-| `ON DELETE RESTRICT` on policy deletion       | Yes             | Generate ADR — surprising, forces workflow     |
-| Kafka over RabbitMQ                           | Yes             | Generate ADR — hard to reverse                 |
-| Idempotency key required on payment mutations | Yes             | Generate ADR — non-obvious requirement         |
-| Using REST instead of GraphQL (standard team) | No              | Skip — obvious choice for this team            |
-| Naming a field `paymentId` vs `payment_id`    | No              | Skip — no trade-off, just convention           |
-| PostgreSQL for primary persistence            | Maybe           | Only if the team considered NoSQL and rejected |
+<process>
 
-If the decision does not meet all three criteria, say: "This decision does not meet the ADR threshold. It will be recorded as a resolved decision in the CONTEXT.md proposal instead."
+1. **Three-Criteria Gate.** Qualify the decision only when ALL three are met: (1) Hard to reverse — undoing requires significant rework; (2) Surprising without context — a developer would choose differently without explanation; (3) Real trade-off — options were weighed with real consequences. If not all three, say: "This decision does not meet the ADR threshold. It will be recorded as a resolved decision in the CONTEXT.md proposal instead."
+2. **Gather decision context.** Capture what was decided, what was rejected, what forced the decision, the consequences, the bounded context, and any superseded ADR.
+3. **Assign ADR ID.** Read the index, find the highest existing ID, assign the next sequential ID (ADR-001 if none). Confirm: "I will assign ID ADR-{id}. Does this look right?"
+4. **Draft the ADR** using `templates/adrs/adr.md`: imperative specific title; context explains the problem not the solution; active-voice decision; at least one rejected alternative with trade-off; consequences listing what becomes easier and harder; all terms match CONTEXT.md. Present the draft and wait for approval.
+5. **Write the ADR** on approval: generate slug from title, write to `.velocity/artifacts/adrs/ADR-{id}-{slug}.md`, add the index row, and update any superseded ADR's status.
+6. **CONTEXT.md decision entry.** Add a reference under "Decisions resolved" linking the decision statement to ADR-{id}.
+7. **Retroactive mode** (when recording a past decision): behave identically but set the date to when the decision was made, set status Accepted, and add a note that the ADR was written retroactively.
 
----
+</process>
 
-## Step 1 — Gather Decision Context
+<pitfalls>
 
-Ask the developer (or extract from the invoking skill's session context):
+- Drafting an ADR that fails to pass all three gate criteria
+- Writing context that describes the solution rather than the problem
+- Vague titles instead of specific imperative ones
+- Omitting alternatives or listing only one option without trade-offs
+- Using domain terms that do not match CONTEXT.md
+- Including code snippets or library versions that will become stale
 
-1. What was decided? (One sentence, active voice)
-2. What was the alternative that was rejected?
-3. What forced this decision — what problem or constraint led here?
-4. What are the consequences? What becomes easier? What becomes harder?
-5. Which bounded context does this decision apply to?
-6. Is there an existing ADR this supersedes?
+</pitfalls>
 
----
-
-## Step 2 — Assign ADR ID
-
-Read `.velocity/knowledge-base/adrs/index.md`.
-
-Find the highest existing ADR ID. Assign the next sequential ID.
-
-If the index does not exist or is empty: assign ADR-001.
-
-Confirm: "I will assign ID ADR-{id}. Does this look right?"
-
----
-
-## Step 3 — Draft the ADR
-
-Produce the ADR using the template from `templates/adrs/adr.md`.
-
-Apply the following rules:
-
-- **Title**: Short, imperative, specific. "Use idempotency keys on all payment mutations." Not "ADR about idempotency."
-- **Context**: What forced the decision — the problem, the constraint, the pressure. Not the decision itself.
-- **Decision**: What was decided. Active voice. One or two sentences.
-- **Alternatives considered**: What was rejected and why. Be honest about trade-offs.
-- **Consequences**: What becomes easier. What becomes harder. What is now constrained.
-- **Domain language**: All entity names, event names, and field names must match CONTEXT.md terms for the relevant bounded context.
-
-Present the draft to the developer:
-
-> "Here is the draft ADR. Review it — correct anything that is wrong, add any nuance. Say 'approve' to write it to disk."
-
----
-
-## Step 4 — Write the ADR
-
-When the developer approves the draft:
-
-1. Generate the slug from the title: lowercase, hyphens, no punctuation.
-   - "Use idempotency keys on all payment mutations" → `use-idempotency-keys-on-payment-mutations`
-
-2. Write the ADR file:
-   - Path: `.velocity/artifacts/adrs/ADR-{id}-{slug}.md`
-
-3. Update `.velocity/knowledge-base/adrs/index.md`:
-   - Add a new row: `| ADR-{id} | {Title} | {date} | {bounded-context} | Accepted |`
-
-4. If this ADR supersedes an existing ADR:
-   - Update the superseded ADR's status line to: `## Status: Superseded by ADR-{new-id}`
-   - Update the index row for the superseded ADR
-
-Say: "ADR-{id} written to `.velocity/artifacts/adrs/ADR-{id}-{slug}.md` and indexed."
-
----
-
-## Step 5 — CONTEXT.md Decision Entry
-
-After writing the ADR, add a reference to the CONTEXT.md proposal for this session:
-
-```markdown
-### Decisions resolved
-
-- {Decision statement} → ADR-{id}
-```
-
-This links the CONTEXT.md Decisions section to the full ADR.
-
----
-
-## Retroactive ADR Mode
-
-Invoked when the developer wants to record a decision that was made in the past (during code review, architecture review, or a previous grill-with-docs session that did not produce an ADR).
-
-Behave identically to the standard flow, but:
-
-- Set `## Date:` to the date the decision was actually made (ask the developer if unsure)
-- Set `## Status: Accepted` (retroactive ADRs are always already accepted)
-- Add a note: `> Note: This ADR was written retroactively on {today}. The decision was made on {original-date}.`
-
----
-
-## ADR Status Lifecycle
-
-| Status       | Meaning                                                              |
-| ------------ | -------------------------------------------------------------------- |
-| `Accepted`   | Active decision; all new work should comply                          |
-| `Deprecated` | Still in effect but may be removed; new work should not depend on it |
-| `Superseded` | Replaced by a newer ADR; add a reference to the superseding ADR      |
-| `Proposed`   | Under discussion; not yet accepted                                   |
-
-To change an ADR's status: invoke this skill with the ADR ID and the new status. The skill will update the file and the index.
-
----
-
-## ADR Quality Rules
-
-An ADR that fails any of these rules should be revised before writing:
-
-- Title is imperative and specific (not vague like "database decision")
-- Context explains the **problem**, not the solution
-- Decision is one or two sentences, active voice
-- Alternatives section lists at least one rejected option with its trade-off
-- Consequences section lists at least one thing that becomes harder
-- All domain terms match CONTEXT.md
-- No implementation details that will become stale (no code snippets, no library versions unless the version is the decision)
+</adr-engine>

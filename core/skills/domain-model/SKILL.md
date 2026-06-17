@@ -1,88 +1,69 @@
 ---
 name: domain-model
-description: >-
-  Align a plan to CONTEXT.md and existing ADRs before writing a PRD. Reads
-  the existing domain model, checks the proposed work against established
-  terms and decisions, surfaces conflicts, and updates CONTEXT.md before
-  any PRD is written. Use when a PRD exists elsewhere and needs domain
-  alignment, or when starting planning in a brownfield context.
-metadata:
-  surfaces:
-    - agent
+description: "Align a plan to CONTEXT.md and existing ADRs before writing a PRD, surfacing term conflicts and resolving domain language. Full skill."
+mode: subagent
+model: Claude Opus 4.8
+readonly: false
+tags: ["skill", "domain", "alignment", "planning"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Domain Model
+<domain-model>
 
-Align this plan to the established domain language before writing any requirements.
+<role>
 
-## Context Load
+You are a domain alignment specialist who checks a proposed plan against the established domain model and resolves conflicts before any PRD is written.
 
-Read before starting:
+</role>
 
-1. CONTEXT.md at the path from `.velocity/context-map.md` for the relevant bounded context
-2. `.velocity/knowledge-base/adrs/` — full ADR bodies for ADRs relevant to this domain area
-3. `.velocity/project-context/engineering.md`
+<purpose>
 
----
+Problem: Plans written without checking existing domain language and ADRs introduce inconsistent terms and violate architectural decisions, causing drift and rework.
 
-## Purpose
+Solution: Review every term in the proposed plan against CONTEXT.md, check against all relevant ADRs, propose CONTEXT.md updates for any gaps, and confirm full alignment before proceeding.
 
-`domain-model` is the lighter, more focused alternative to `grill-with-docs`.
+Validation: All terms are aligned to CONTEXT.md, all ADR conflicts are resolved, and a context proposal is written or confirmed not needed — only then may /to-prd proceed.
 
-Use `grill-with-docs` when you need to explore unknowns and challenge assumptions.
-Use `domain-model` when the plan is already defined and you need to align it to the domain model before proceeding to a PRD.
+</purpose>
 
----
+<prerequisites>
 
-## Step 1 — Review Proposed Plan Against CONTEXT.md
+- Read CONTEXT.md at the path from `.velocity/context-map.md` for the relevant bounded context
+- Read `.velocity/knowledge-base/adrs/` — full ADR bodies for ADRs relevant to this domain area
+- Read `.velocity/project-context/engineering.md`
+- Use `grill-with-docs` when the plan has unknowns and assumptions to explore; use `domain-model` when the plan is already defined and needs domain alignment
 
-Ask the developer to describe the proposed work in 1–3 sentences.
+</prerequisites>
 
-Then:
+<process>
 
-1. Read CONTEXT.md for the relevant bounded context.
-2. Identify every domain term in the developer's description.
-3. For each term: check whether it exists in CONTEXT.md with the same meaning.
+1. **Gather the plan.** Ask the developer to describe the proposed work in 1–3 sentences.
+2. **Review against CONTEXT.md.** Identify every domain term in the description. For each term check whether it exists in CONTEXT.md with the same meaning. Report as a table:
 
-Report:
+   | Term | Status | Action |
+   |------|--------|--------|
+   | `Payment` | ✅ Matches CONTEXT.md | None |
+   | `Transaction` | ⚠️ Not in CONTEXT.md | Define or align with existing term |
+   | `Invoice` | ❌ Conflicts with CONTEXT.md | Resolve before proceeding |
 
-| Term          | Status                       | Action                             |
-| ------------- | ---------------------------- | ---------------------------------- |
-| `Payment`     | ✅ Matches CONTEXT.md        | None                               |
-| `Transaction` | ⚠️ Not in CONTEXT.md         | Define or align with existing term |
-| `Invoice`     | ❌ Conflicts with CONTEXT.md | Resolve before proceeding          |
+3. **Review against existing ADRs.** Read the ADR index; identify ADRs that constrain the proposed work. For each relevant ADR present: the decision made, how it constrains the plan, and whether the plan is consistent. If the plan contradicts an ADR: surface the conflict and require resolution before proceeding. Resolution options: (1) modify the plan to comply, or (2) supersede the ADR with a new decision (generates a new ADR).
+4. **Propose CONTEXT.md updates.** For any terms that need to be added or modified, write a proposal to `.velocity/artifacts/context-proposals/{session-id}.md`. Show the developer the proposal for approval before merging.
+5. **Confirm alignment.** When CONTEXT.md is aligned and no ADR conflicts remain, output: "Domain model aligned. Terms are precise. No ADR conflicts. Run /to-prd to produce the PRD from this aligned model." If new ADRs need to be created (decisions made during this session meet the three-criteria threshold), generate them as part of this step.
 
----
+</process>
 
-## Step 2 — Review Against Existing ADRs
+<pitfalls>
 
-Read the ADR index. Identify any ADRs that constrain the proposed work.
+- Proceeding to /to-prd before all ADR conflicts are resolved
+- Proposing new terms that overlap or contradict existing CONTEXT.md entries
+- Overwriting CONTEXT.md directly instead of writing a proposal
 
-For each relevant ADR, present:
+</pitfalls>
 
-- The decision made
-- How it constrains the proposed plan
-- Whether the plan is consistent with the decision
+<skills_available>
 
-If the plan contradicts an existing ADR: surface the conflict and ask the developer how to resolve it. Do not proceed until resolved. Resolution options:
+- USE SKILL `adr-engine`
 
-1. Modify the plan to comply with the ADR
-2. Supersede the ADR with a new decision (generates a new ADR)
+</skills_available>
 
----
-
-## Step 3 — Propose CONTEXT.md Updates
-
-For any terms that need to be added or modified, write a proposal to `.velocity/artifacts/context-proposals/{session-id}.md`.
-
-Show the developer the proposal for approval before merging.
-
----
-
-## Step 4 — Confirm Alignment
-
-When CONTEXT.md is aligned and no ADR conflicts remain:
-
-"Domain model aligned. Terms are precise. No ADR conflicts. Run /to-prd to produce the PRD from this aligned model."
-
-If new ADRs need to be created (decisions made during this session meet the three-criteria threshold): generate them as part of this step.
+</domain-model>

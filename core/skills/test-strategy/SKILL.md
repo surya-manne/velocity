@@ -1,234 +1,81 @@
 ---
 name: test-strategy
-description: >-
-  Produce a test strategy for a feature covering unit, integration, end-to-end,
-  performance, and security testing. Configured for the detected test framework.
-  Specifies test types, coverage targets, test data requirements, and CI gate
-  placement. Also produces Performance Test Plans and Security Testing Plans
-  when the feature requires them. Stored under .velocity/artifacts/test-strategy/.
-  Invoked by the QA Agent or directly before implementation begins.
-metadata:
-  surfaces:
-    - agent
+description: "Produce a test strategy for a feature covering unit, integration, end-to-end, performance, and security testing. Configured for the detected test framework. Specifies test types, coverage targets, test data requirements, and CI gate placement. Invoked by the QA Agent or directly before implementation begins."
+mode: skill
+readonly: false
+tags: ["skill", "testing", "strategy", "qa"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# Test Strategy
+<test-strategy>
 
-Produce a test strategy for this feature.
+<role>
 
-## Context Load
+You are a test strategy architect who produces framework-configured, coverage-targeted test plans covering unit, integration, contract, E2E, performance, and security testing for each vertical slice.
 
-Read before starting:
+</role>
 
-1. `.velocity/project-context/testing.md` — testing standards, framework, coverage requirements
-2. CONTEXT.md at the path from `.velocity/context-map.md` for the relevant bounded context
-3. `.velocity/artifacts/prds/` — relevant PRD for acceptance criteria
-4. `.velocity/artifacts/features/` — feature task list (if it exists)
-5. `.velocity/knowledge-base/adrs/index.md` — any ADRs relevant to testing strategy
-6. `.velocity/project-intelligence/stack.md` — detected test framework(s)
+<purpose>
 
----
+Problem: Features ship without a documented test strategy, leaving coverage gaps discovered only during incidents or security audits.
 
-## Step 1 — Identify Test Scope
+Solution: Produce a complete test strategy document that specifies test types, coverage targets, test data requirements, CI gate placement, and — when triggered — performance and security test plans.
 
-Ask the developer (or extract from PRD and feature definition):
+Validation: Every touched layer has test types defined; coverage targets reference guardrail config; CI gate placement is specified; all domain terms match CONTEXT.md; document is written to `.velocity/artifacts/test-strategy/` after developer approval.
 
-1. What layers does this feature touch? (UI / API / domain logic / persistence / messaging)
-2. What are the acceptance criteria from the PRD?
-3. Are there performance requirements? (latency targets, throughput targets)
-4. Does this feature touch security-sensitive areas? (auth, PII, payments)
-5. What is the existing test coverage baseline for this area?
+</purpose>
 
----
+<prerequisites>
 
-## Step 2 — Test Type Selection
+- `.velocity/project-context/testing.md` — testing standards, framework, coverage requirements
+- CONTEXT.md from `.velocity/context-map.md` for the relevant bounded context
+- `.velocity/artifacts/prds/` — relevant PRD for acceptance criteria
+- `.velocity/artifacts/features/` — feature task list (if exists)
+- `.velocity/project-intelligence/stack.md` — detected test frameworks
 
-Determine which test types are required for this feature:
+</prerequisites>
 
-| Test Type   | Applies when                                                 | Framework (detected)            |
-| ----------- | ------------------------------------------------------------ | ------------------------------- |
-| Unit        | Domain logic, pure functions, data transformations           | {{TEST_FRAMEWORK}}              |
-| Integration | DB interactions, service-to-service calls, message consumers | {{INTEGRATION_TEST_FRAMEWORK}}  |
-| Contract    | API consumed by other services; event schema changes         | Pact / schema registry          |
-| Component   | UI components in isolation                                   | Jest + Testing Library / Vitest |
-| End-to-End  | Critical user journeys that span all layers                  | {{E2E_FRAMEWORK}}               |
-| Performance | Features with latency/throughput requirements                | k6 / Gatling / JMeter           |
-| Security    | Features touching auth, PII, or public endpoints             | OWASP ZAP / custom              |
+<process>
 
----
+**Step 1 — Identify Test Scope**
+Ask: which layers does this feature touch, what are the acceptance criteria from the PRD, are there performance requirements (latency/throughput targets), does it touch security-sensitive areas (auth/PII/payments), what is the existing coverage baseline.
 
-## Step 3 — Test Plan
+**Step 2 — Test Type Selection**
+Determine which test types apply based on layers and triggers: unit / integration / contract / component / E2E / performance / security.
 
-For each test type that applies, produce:
+**Step 3 — Test Plan per Type**
+- **Unit:** Table of behaviours using `should_{outcome}_when_{condition}` naming. One behaviour per test. Assert on outcomes, not implementation.
+- **Integration:** Table of integration points, scenarios, and test data. Use testcontainers — no mocked databases in integration tests. Every message consumer must have an integration test.
+- **Contract:** Provider/consumer pairs, contract type (Pact/schema registry), verification cadence.
+- **E2E:** Critical user journeys only. Isolated per run. Flaky tests blocked from merge.
 
-### Unit Tests
+**Step 4 — Coverage Targets**
+State per-layer targets from `test_coverage_minimum` in guardrail config. 100% of PRD acceptance criteria must be covered by tests.
 
-| Behaviour to test                         | Test case name                      | Happy path? | Edge case? |
-| ----------------------------------------- | ----------------------------------- | ----------- | ---------- |
-| {domain behaviour using CONTEXT.md terms} | `should_{outcome}_when_{condition}` | {yes/no}    | {yes/no}   |
+**Step 5 — Performance Test Plan** (if triggered: latency/throughput requirements)
+Define load profile (normal/peak/sustained), SLA targets (p50/p95/p99/error rate/throughput), and a bottleneck hypothesis. Never run performance tests without a stated hypothesis.
 
-Rules:
+**Step 6 — Security Testing Plan** (if triggered: auth, PII, payments, or public API)
+Table security test cases: authentication/authorization/input validation/rate limiting/secrets/audit log scenarios with pass criteria. Document pentest scope if significant new attack surface is introduced.
 
-- Test behaviour, not implementation. Assert on outcomes, not on which methods were called.
-- One behaviour per test. No multi-assertion tests unless they test the same behaviour.
-- Test case names use the `should_{outcome}_when_{condition}` convention.
-- All domain terms in test names match CONTEXT.md.
+**Step 7 — CI Gate Placement**
+Unit and integration on every PR (blocking); E2E smoke on every PR, full suite nightly; contract on every PR for providers; performance pre-release; security SAST every PR, DAST weekly.
 
-### Integration Tests
+**Step 8 — Test Data Strategy**
+Table every data entity: source (factory/fixture/seed), isolation (per-test), and cleanup approach.
 
-| Integration point  | Scenario   | Test data requirement      |
-| ------------------ | ---------- | -------------------------- |
-| {service/db/queue} | {scenario} | {what test data is needed} |
+**Step 9 — Review and Write**
+Present strategy to developer. On approval: write to `.velocity/artifacts/test-strategy/{slug}.md`, update knowledge-base index.
 
-Rules:
+</process>
 
-- Use test containers or equivalents — no mocked databases in integration tests.
-- Every message consumer must have an integration test that sends a real message and asserts the side effect.
-- Every database interaction must have an integration test that confirms persistence and retrieval.
+<pitfalls>
 
-### Contract Tests (if applicable)
+- Mocking databases in integration tests — hides real persistence bugs
+- Writing E2E tests for edge cases instead of critical paths only
+- Missing a bottleneck hypothesis before running performance tests
+- Using test names that describe implementation rather than behaviour
 
-| Provider  | Consumer   | Contract type | Verification cadence |
-| --------- | ---------- | ------------- | -------------------- |
-| {service} | {consumer} | Pact / schema | {on PR / nightly}    |
+</pitfalls>
 
-### End-to-End Tests
-
-| User journey                     | Entry point    | Critical assertions | Exit state    |
-| -------------------------------- | -------------- | ------------------- | ------------- |
-| {journey using CONTEXT.md terms} | {URL / screen} | {what must be true} | {final state} |
-
-Rules:
-
-- E2E tests cover the critical paths only — not every edge case.
-- E2E tests must be isolated: no shared state between test runs.
-- Flaky tests are blocked from merge.
-
----
-
-## Step 4 — Coverage Targets
-
-State coverage targets per test type:
-
-| Layer                  | Minimum coverage            | Basis            |
-| ---------------------- | --------------------------- | ---------------- |
-| Domain logic           | {{TEST_COVERAGE_MINIMUM}}%  | Guardrail config |
-| API handlers           | {{TEST_COVERAGE_MINIMUM}}%  | Guardrail config |
-| UI components          | {{TEST_COVERAGE_MINIMUM}}%  | Guardrail config |
-| Critical user journeys | 100% of acceptance criteria | PRD              |
-
----
-
-## Step 5 — Performance Test Plan (if triggered)
-
-Produce when the feature has latency or throughput requirements:
-
-### Load Profile
-
-| Scenario       | Concurrent users | Duration   | Ramp-up |
-| -------------- | ---------------- | ---------- | ------- |
-| Normal load    | {n}              | {duration} | {ramp}  |
-| Peak load      | {n}              | {duration} | {ramp}  |
-| Sustained load | {n}              | {duration} | {ramp}  |
-
-### SLA Targets
-
-| Metric      | Target     | Failure threshold |
-| ----------- | ---------- | ----------------- |
-| p50 latency | {value}    | {value}           |
-| p95 latency | {value}    | {value}           |
-| p99 latency | {value}    | {value}           |
-| Error rate  | < {value}% | > {value}%        |
-| Throughput  | {rps}      | {rps}             |
-
-### Bottleneck Hypothesis
-
-State the expected bottleneck before running the test. Do not run performance tests without a hypothesis.
-
-Example: "Expected bottleneck is DB connection pool exhaustion under peak load for the `listPayments` query."
-
----
-
-## Step 6 — Security Testing Plan (if triggered)
-
-Produce when the feature touches auth, PII, payments, or public API surface:
-
-### Security Test Cases
-
-| Category         | Test scenario                               | Pass criteria                                 |
-| ---------------- | ------------------------------------------- | --------------------------------------------- |
-| Authentication   | Call API without token                      | 401, no data leak                             |
-| Authentication   | Call API with expired token                 | 401, no data leak                             |
-| Authorization    | Access resource belonging to another tenant | 403, no data leak                             |
-| Input validation | Send oversized payload                      | 400 or 413, no crash                          |
-| Input validation | Inject SQL in query param                   | 400, no stack trace                           |
-| Input validation | XSS payload in string field                 | Escaped in response                           |
-| Rate limiting    | Exceed rate limit                           | 429 with Retry-After header                   |
-| Secrets          | Check error responses for secrets           | No keys, passwords, tokens in body            |
-| Audit log        | Perform a sensitive action                  | Action logged with actor, timestamp, resource |
-
-### Penetration Test Scope (if applicable)
-
-If this feature introduces significant new attack surface, document the pentest scope:
-
-- Endpoints in scope
-- Auth mechanisms to probe
-- Data classes at risk
-- Known exclusions
-
----
-
-## Step 7 — CI Gate Placement
-
-State where each test type runs in the pipeline:
-
-| Test type   | CI gate                                  | Blocking?             |
-| ----------- | ---------------------------------------- | --------------------- |
-| Unit        | Every PR                                 | Yes                   |
-| Integration | Every PR                                 | Yes                   |
-| Contract    | Every PR (provider) / nightly (consumer) | Yes                   |
-| E2E         | Every PR (smoke) / nightly (full suite)  | Smoke: yes / Full: no |
-| Performance | Pre-release / nightly                    | Yes (SLA breach)      |
-| Security    | Every PR (SAST) / weekly (DAST)          | SAST: yes / DAST: no  |
-
----
-
-## Step 8 — Test Data Strategy
-
-| Data type                       | Source                   | Isolation | Cleanup         |
-| ------------------------------- | ------------------------ | --------- | --------------- |
-| {entity using CONTEXT.md terms} | Factory / fixture / seed | Per-test  | After each test |
-
-Rules:
-
-- No production data in tests. Ever.
-- Test data factories use CONTEXT.md terms for all fields.
-- PII fields use anonymised or synthetic values.
-
----
-
-## Step 9 — Write the Test Strategy
-
-When the developer approves:
-
-1. Write to: `.velocity/artifacts/test-strategy/{feature-slug}.md` using `templates/artifacts/test-strategy.md`
-2. If a performance test plan was produced: `.velocity/artifacts/test-strategy/{feature-slug}-performance.md`
-3. If a security testing plan was produced: `.velocity/artifacts/test-strategy/{feature-slug}-security.md`
-4. Update `.velocity/knowledge-base/index.md`:
-   - Add: `| test-strategy | {title} | .velocity/artifacts/test-strategy/{feature-slug}.md | {date} |`
-
-Say: "Test strategy written to `.velocity/artifacts/test-strategy/{feature-slug}.md`."
-
----
-
-## Test Strategy Quality Rules
-
-A test strategy that fails any rule should be revised:
-
-- Every acceptance criterion from the PRD maps to at least one test case
-- Unit test names describe behaviour, not implementation
-- Integration tests use real infrastructure (no mocked databases)
-- E2E tests cover all critical happy paths and the most important error path
-- Performance tests have a bottleneck hypothesis before running
-- Security tests cover auth bypass, input validation, and data leakage for every triggered area
-- Coverage targets are explicit numbers, not "comprehensive" or "good"
+</test-strategy>

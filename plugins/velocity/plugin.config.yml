@@ -38,13 +38,8 @@ sources:
   schemas: core/schemas
   hooks: core/hooks.json
 
-# Skills NOT shipped as plugin commands. These are either parent index docs or
-# install paths made redundant by the native plugin install flow.
-exclude_skills:
-  - ralph # parent index; real skills live under ralph/annotate, ralph/learn
-  - local-installer # superseded by native plugin install
-  - plugin-installer # superseded by native plugin install
-  - marketplace # platform-internal registry skill
+# Skills NOT shipped as plugin commands.
+exclude_skills: []
 
 # Override a command name when it must differ from the skill's frontmatter `name`.
 # (By default the builder uses the skill's `name`, falling back to its directory.)

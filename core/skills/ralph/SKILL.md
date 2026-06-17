@@ -1,137 +1,66 @@
 ---
 name: ralph
-description: >-
-  RALPH Loop navigation. Run → Annotate → Learn → Propose → Harden.
-  Velocity's internal self-improvement cycle. Used exclusively to build and
-  improve the Velocity platform. Not shipped to consumer repositories.
-  Entry point for the four RALPH sub-skills.
-metadata:
-  surfaces:
-    - agent
-  internal: true
+description: "RALPH Loop — Run → Annotate → Learn → Propose → Harden. Velocity's feedback cycle for improving its own skills, agent configs, and guardrails. Invoke the full loop or individual steps: annotate, learn, propose, harden."
+mode: skill
+readonly: false
+tags: ["skill", "ralph", "feedback", "quality"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# RALPH Loop
+<ralph>
 
-> **Internal to the Velocity project. Not shipped to consumer repositories.**
+<role>
 
-RALPH = **R**un → **A**nnotate → **L**earn → **P**ropose → **H**arden
+You are the RALPH Loop coordinator who runs Velocity's feedback cycle: capturing structured annotations after skill runs, extracting failure patterns from 5+ annotations, drafting targeted before/after improvements, and applying developer-approved proposals.
 
-The RALPH Loop is Velocity's feedback mechanism for improving its own skills, agent configs, and guardrails. Every time a Velocity skill is evaluated on a test scenario, the output is annotated. Annotations accumulate. Patterns are extracted. Improvements are proposed and applied. Velocity becomes measurably better with every development cycle.
+</role>
 
----
+<purpose>
 
-## Context Load
+Problem: Velocity skills degrade over time without a structured feedback mechanism, leaving recurring failures unaddressed and improvements based on guesswork.
 
-Read before starting:
+Solution: Run the four-step RALPH loop (Annotate → Learn → Propose → Harden) to systematically extract patterns from real skill evaluations and apply targeted improvements.
 
-1. `.velocity/artifacts/ralph/index.md` — current annotation index, cadence status, skill coverage table
+Validation: Every annotation has a quality rating; every learn batch covers 5+ rated annotations; every proposal has a before/after diff; every harden step is logged to harden-log.md.
 
----
+</purpose>
 
-## The Four Skills
+<prerequisites>
 
-| Command           | When to Run                                                                            | Output                                                             |
-| ----------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `/ralph-annotate` | After evaluating any Velocity skill output on a test scenario or the Velocity codebase | `.velocity/artifacts/ralph/{run-id}.md`                            |
-| `/ralph-learn`    | When 5+ annotations exist for a skill                                                  | `.velocity/artifacts/ralph/learn-{skill}-{date}.md`                |
-| `/ralph-propose`  | After ralph-learn produces a pattern summary                                           | `.velocity/artifacts/ralph/propose-{skill}-{date}.md`              |
-| `/ralph-harden`   | After ralph-propose proposals are reviewed and approved                                | Files modified + `.velocity/artifacts/ralph/harden-log.md` updated |
+- `.velocity/artifacts/ralph/index.md` — current annotation index, cadence status, skill coverage table
 
----
+</prerequisites>
 
-## The Loop
+<process>
 
-```text
-R — Run
-    Engineer Agent runs a skill on the Velocity codebase or a test scenario
-    (e.g. /init generates a Cursor adapter for a test repo)
-        ↓
-A — Annotate
-    /ralph-annotate — structured feedback capture
-    Written to .velocity/artifacts/ralph/{run-id}.md
-    Captures: what worked, what failed, what was missing, severity
-        ↓
-L — Learn (when 5+ annotations for the same skill)
-    /ralph-learn — extract recurring failure patterns across N annotated runs
-    Written to .velocity/artifacts/ralph/learn-{skill-name}-{date}.md
-        ↓
-P — Propose
-    /ralph-propose — draft targeted improvements with before/after diffs
-    Written to .velocity/artifacts/ralph/propose-{skill-name}-{date}.md
-    Developer reviews: approve / modify / reject each proposal
-        ↓
-H — Harden
-    /ralph-harden — apply approved proposals, regenerate affected assets
-    Updates .velocity/artifacts/ralph/harden-log.md
-    Note: run Cursor Adapter delta to propagate changes to .cursor/ assets
-```
+**Commands:**
 
----
+| Command | When to Run | Output |
+|---|---|---|
+| `/ralph annotate` | After evaluating any Velocity skill output | `.velocity/artifacts/ralph/{skill}-{YYYY-MM-DD}-{N}.md` |
+| `/ralph learn` | When 5+ rated annotations exist for a skill | `.velocity/artifacts/ralph/learn-{skill}-{date}.md` |
+| `/ralph propose` | After learn produces a pattern summary | `.velocity/artifacts/ralph/propose-{skill}-{date}.md` |
+| `/ralph harden` | After proposals are reviewed and approved | Files modified + `harden-log.md` updated |
 
-## Cycle Cadence
+**Annotate:** Interview developer for what worked, what failed (with expected vs actual vs hypothesis), and what was missing. Capture severity counts (critical/major/minor) and a mandatory quality rating (1–5). Skill-learn skips annotations without a rating.
 
-### Batch thresholds
+**Learn (5+ annotations required):** Cluster failures into patterns: occurrence count, affected skill sections, stacks where failure occurred, root cause hypothesis, severity distribution. Rank: critical first → high-frequency (3+) → cross-stack → stack-specific. Mark annotations as `processed: true`. Write learn report.
 
-| Setting                                                            | Value  |
-| ------------------------------------------------------------------ | ------ |
-| Minimum annotations before ralph-learn                             | **5**  |
-| Maximum annotations per learn batch                                | **20** |
-| Annotations marked Skip are excluded from learn batches            |        |
-| **Annotations without a Quality Rating are excluded from batches** |        |
+**Propose:** Read learn report and source skill templates from `skills/`. Draft before/after diffs for each pattern. Present per-proposal for developer approve/modify/reject.
 
-### Recommended cadence for the Velocity team
+**Harden:** Apply only developer-approved proposals to skill files. Log all changes to `.velocity/artifacts/ralph/harden-log.md`. Never modify files without explicit per-proposal approval.
 
-```text
-Daily / per-session:
-  Run /ralph-annotate after evaluating any skill output on a test repo.
-  Loop auto-generates stubs — fill in quality signal after reviewing PRs.
+**Cadence:** Minimum 5 annotations before learn; maximum 20 per batch; recommended rhythm: annotate after every run → learn when 5+ exist → propose → harden per sprint.
 
-Weekly (or when 5+ annotations exist for a skill):
-  Run /ralph-learn for the target skill.
-  Review patterns; identify the top 1–3 priority improvements.
+</process>
 
-Per sprint (or when 3+ high-priority patterns identified):
-  Run /ralph-propose → review proposals → run /ralph-harden.
-  Run Cursor Adapter delta to propagate changes.
-  Re-run the skill against the original test scenario to verify improvement.
+<pitfalls>
 
-Quarterly:
-  Review harden-log.md for cumulative quality trends.
-  Update the Skill Coverage table in .velocity/artifacts/ralph/index.md.
-```
+- Running learn with fewer than 5 rated annotations — produces noise patterns
+- Applying harden without explicit per-proposal developer approval
+- Annotating without a quality rating — those annotations are excluded from learn
+- Proposing changes that fix symptoms instead of root causes identified in learn
 
----
+</pitfalls>
 
-## What RALPH Improves
-
-| Artifact                   | How it improves                                           |
-| -------------------------- | --------------------------------------------------------- |
-| Skill templates            | Recurring output failures → targeted prompt refinements   |
-| Agent system prompts       | Missing context patterns → additional context load steps  |
-| Guardrail definitions      | False positives / false negatives → threshold adjustments |
-| Adapter generators         | Edge case failures → explicit handling added              |
-| Project Intelligence rules | Mis-detected stack signals → fingerprinting tightened     |
-| Grill Me question banks    | Vague questions → sharpened or replaced                   |
-
----
-
-## Integration with the Autonomous Loop
-
-When `/loop` completes a task, it automatically generates a RALPH feedback stub at `.velocity/artifacts/ralph/{task-id}-stub-{date}.md`.
-
-The stub is pre-populated with run context (task, stack, TDD attempts, validation result, PR number). The developer **must fill in the `Quality Rating` field (1–5) after reviewing the PR** — this is the primary quality signal for pattern extraction.
-
-**`ralph-learn` skips stubs where `Quality rating:` is still `— /5` (unfilled).** A stub with an empty rating is a partial annotation that provides no signal for learning.
-
-When 5+ rated stubs exist for the `loop → tdd` skill chain, run `/ralph-learn` to extract patterns from the automated development runs.
-
----
-
-## Scope Constraint
-
-RALPH annotations, learn reports, proposal bundles, and the harden log live exclusively in `.velocity/artifacts/ralph/` in the Velocity development repository.
-
-Nothing in the RALPH directory is included in consumer repository templates.
-
-The Velocity `/init` skill and `/sync` command do not copy `.velocity/artifacts/ralph/` to consumer repositories.
+</ralph>

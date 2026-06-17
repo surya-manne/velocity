@@ -1,207 +1,59 @@
 ---
 name: to-tasks
-description: >-
-  Decompose a feature into independently implementable tasks with explicit
-  blocking relationships. Each task is small enough to be completed in one
-  tdd session (one fresh context window). Run after to-features, before
-  starting tdd on each task.
-metadata:
-  surfaces:
-    - agent
+description: "Decompose a feature into independently implementable tasks with explicit blocking relationships, each small enough for one tdd session. Full skill."
+mode: subagent
+model: Claude Opus 4.8
+readonly: false
+tags: ["skill", "tasks", "decomposition", "tdd"]
+baseSchema: docs/schemas/skill.md
 ---
 
-# To Tasks
+<to-tasks>
 
-Decompose this feature into tasks the Engineer can implement one at a time, each in a fresh context window.
+<role>
 
-## Context Load
+You are a task decomposition specialist who breaks features into single-behavior, independently implementable tasks each completable in one tdd session.
 
-Read before starting:
+</role>
 
-1. `.velocity/artifacts/features/{feature-id}.md` — the feature to decompose
-2. CONTEXT.md from `.velocity/context-map.md`
+<purpose>
 
----
+Problem: Features implemented as a whole overwhelm context windows, create unclear ownership, and produce untestable increments.
 
-## Task Sizing Principle
+Solution: Decompose each feature into tasks with a single clear behavior, explicit interface, first failing test, blocking dependencies, and acceptance signal — each right-sized for one tdd context window (under 2 hours).
 
-A task is right-sized when:
+Validation: Every task has a single testable behavior, no L-complexity task is left unsplit, and all blocking relationships form an acyclic dependency graph.
 
-- It can be implemented in **one tdd session** (one context window, under 2 hours of work)
-- It has a **single clear behavior** to test
-- It **does not block itself** — all its dependencies can be resolved before it starts
-- When complete, **something is testable** — a unit test passes, an integration test passes, or an acceptance criterion is partially satisfied
+</purpose>
 
-Too large: "Implement payment processing" → break it down
-Right-sized: "Implement PaymentService.charge() — deduct from balance, return PaymentResult"
+<prerequisites>
 
----
+- Read `.velocity/artifacts/features/{feature-id}.md` — the feature to decompose
+- Read CONTEXT.md from `.velocity/context-map.md`
+- Run after `to-features`, before starting `tdd` on each task
 
-## Task Decomposition Protocol
+</prerequisites>
 
-For each task:
+<process>
 
-1. State the **behavior** (not implementation): what does this task make the system do?
-2. State the **interface**: what is the function/endpoint/component signature?
-3. State the **test first**: what is the first failing test that this task satisfies?
-4. State the **blocking dependencies**: which other tasks must be complete first?
-5. State the **acceptance signal**: how do you know this task is done?
+1. **Apply task sizing.** A task is right-sized when: implementable in one tdd session (one context window, under 2 hours), has a single clear behavior to test, does not block itself, and produces something testable when complete. L-complexity tasks (90+ min) must be split.
+2. **For each task, define:** (1) behavior — what the system does after this task is complete, (2) interface — function/endpoint/component signature, (3) first failing test — test name and assertion in the detected test framework's style, (4) blocking dependencies — which tasks must complete first, (5) acceptance signal — how you know this task is done.
+3. **Determine version.** New board: write to `.velocity/artifacts/tasks/{feature-id}-v1.md`. Revised board: archive as `{feature-id}-v{N}-archived-{date}.md`, write new version with `## Change from v{N}:` line.
+4. **Write the task board** to `.velocity/artifacts/tasks/{feature-id}-v{N}.md`. Header section: `Version`, `Date`, `Source feature: .velocity/artifacts/features/{feature-id}-v{N}.md`, `Bounded Context`. For each task: short behavior description, `Behavior`, `Interface` (code block), `First failing test` (code block in detected test framework style), `Layer` (UI | API | Domain | Persistence | Messaging | Infrastructure), `Estimated complexity` (S = <30 min | M = 30–90 min | L = 90+ min, split L), `Blocked by`, `Acceptance signal`.
+5. **Write the dependency map** and **parallel execution candidates** — identify tasks that share the same single blocker and can run concurrently.
+6. **Write the context window plan.** Each task runs in a fresh context window with: this task definition, CONTEXT.md, `.velocity/project-context/testing.md`, and the handoff artifact from the previous task. State: "No task carries context from previous tasks beyond what is in the handoff artifact."
+7. **Update index.** Create or update `.velocity/artifacts/tasks/index.md`: `| {feature-id} | v{N} | {date} | {N tasks} | {source feature path} |`
+8. **Close with:** "For each task: run /tdd in a fresh context window, providing this task definition as input."
 
----
+</process>
 
-## Versioning
+<pitfalls>
 
-### New task board
+- Creating tasks that have multiple behaviors (will require more than one tdd cycle)
+- Leaving L-complexity tasks unsplit
+- Creating circular blocking dependencies
+- Omitting the interface definition — engineers cannot start without it
 
-When decomposing a feature for the first time:
+</pitfalls>
 
-- Write to: `.velocity/artifacts/tasks/{feature-id}-v1.md`
-- Set `## Version: 1` in the frontmatter
-
-### Revised task board
-
-When re-decomposing a feature (scope changed, tasks re-scoped):
-
-1. Archive the existing file: rename to `{feature-id}-v{N}-archived-{date}.md`
-2. Write the new version to `{feature-id}-v{N+1}.md`
-3. Add a `## Change from v{N}:` line at the top describing what changed
-
-Create or update `.velocity/artifacts/tasks/index.md` with an entry for this task board:
-
-```
-| {feature-id} | v{N} | {date} | {N tasks} | {source feature path} |
-```
-
----
-
-## Output Format
-
-Write to `.velocity/artifacts/tasks/{feature-id}-v{N}.md`:
-
-```markdown
-# Task Board: {Feature Name}
-
-## Version: {N}
-
-## Date: {date}
-
-## Source feature: .velocity/artifacts/features/{feature-id}-v{N}.md
-
-## Bounded Context: {context-name}
-
-{If revision: ## Change from v{N-1}: {one sentence describing the change}}
-
----
-
-## Tasks
-
-### Task 1: {Short behavior description}
-
-**Behavior:** {What the system does after this task is complete}
-
-**Interface:**
-\`\`\`
-{Function signature, API endpoint, or component interface}
-\`\`\`
-
-**First failing test:**
-\`\`\`
-{Test name and what it asserts — in the detected test framework's style}
-\`\`\`
-
-**Layer:** {UI | API | Domain | Persistence | Messaging | Infrastructure}
-
-**Estimated complexity:** {S | M | L} (S = under 30 min, M = 30–90 min, L = 90+ min — L tasks should be split)
-
-**Blocked by:** _(none)_
-
-**Acceptance signal:** {How you know this task is done — test passes, endpoint responds, component renders}
-
----
-
-### Task 2: {Short behavior description}
-
-**Behavior:** {What the system does after this task is complete}
-
-**Interface:**
-\`\`\`
-{Interface definition}
-\`\`\`
-
-**First failing test:**
-\`\`\`
-{Test}
-\`\`\`
-
-**Layer:** {Layer}
-
-**Estimated complexity:** {S | M | L}
-
-**Blocked by:** Task 1
-
-**Acceptance signal:** {Signal}
-
----
-
-[Repeat for all tasks]
-
----
-
-## Dependency Map
-
-Task 1 → Task 2, Task 3
-Task 2 → Task 4
-Task 3 → Task 4
-Task 4 → Task 5
-
-## Parallel execution candidates
-
-Tasks 2 and 3 (both blocked by Task 1 only)
-
----
-
-## Implementation order (sequential recommendation)
-
-1. Task 1 — {behavior}
-2. Task 2 — {behavior}
-   OR Task 3 — {behavior} (can run in parallel with Task 2)
-3. Task 4 — {behavior}
-4. Task 5 — {behavior}
-
----
-
-## Context window plan
-
-Each task runs in a **fresh context window** with these inputs:
-
-- This task definition
-- CONTEXT.md
-- .velocity/project-context/testing.md
-- The handoff artifact from the previous task (if any)
-
-No task carries context from previous tasks beyond what is in the handoff artifact.
-
----
-
-## Version History
-
-| Version | Date   | Summary of changes |
-| ------- | ------ | ------------------ |
-| {N}     | {date} | {summary}          |
-
----
-
-## Next Step
-
-For each task: run /tdd in a fresh context window, providing this task definition as input.
-```
-
----
-
-## Quality Checks
-
-1. No task is labeled "L" (Large) without a comment explaining why it cannot be split.
-2. Every task has a first failing test defined — not "write tests" but the specific first test.
-3. Every term uses CONTEXT.md terminology.
-4. The dependency map is acyclic.
-5. No task creates a foundation with nothing to test until two tasks later.
+</to-tasks>
