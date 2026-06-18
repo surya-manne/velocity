@@ -1,6 +1,6 @@
 # Skills Reference
 
-Velocity ships with 48 production skills organized into 8 categories. Each skill is a `SKILL.md` file — a structured prompt chain that executes within your AI assistant.
+Velocity ships with 49 production skills organized into 8 categories. Each skill is a `SKILL.md` file — a structured prompt chain that executes within your AI assistant.
 
 ## How to Invoke Skills
 
@@ -70,11 +70,12 @@ Skills are invoked in the assistant chat. They always begin by loading context f
 
 ## Context & Knowledge
 
-| Skill           | Command           | Description                                           |
-| --------------- | ----------------- | ----------------------------------------------------- |
-| /context-engine | `/context-engine` | Validate code identifiers match CONTEXT.md            |
-| /context-merge  | `/context-merge`  | Reconcile CONTEXT.md proposals from multiple sessions |
-| /ingest         | `/ingest`         | Knowledge base ingestion + index regeneration         |
+| Skill             | Command             | Description                                                       |
+| ----------------- | ------------------- | ----------------------------------------------------------------- |
+| /context-engine   | `/context-engine`   | Validate code identifiers match CONTEXT.md                        |
+| /context-merge    | `/context-merge`    | Reconcile CONTEXT.md proposals from multiple sessions             |
+| /ingest           | `/ingest`           | Knowledge base ingestion + index regeneration                     |
+| /knowledge-graph  | `/knowledge-graph`  | Blast-radius analysis, symbol context, and execution flow tracing |
 
 ---
 

@@ -120,6 +120,33 @@ RALPH Loop is the project-level feedback loop.
 
 After a phase completes, the team can rate the output. After enough ratings, Velocity suggests improvements to local skills and agent configs.
 
+## Greenfield vs Brownfield
+
+Velocity classifies your repo at `/init` time and runs a different flow based on the result.
+
+| | Greenfield | Brownfield |
+|---|---|---|
+| **Signals** | Little/no source code, no docs, shallow git history | Meaningful source, existing docs, ADRs, or substantial history |
+| **CONTEXT.md** | Empty scaffold — you build the glossary via `/grill-me` | DRAFT terms seeded from code signals by `context-harvest` |
+| **Knowledge base** | Placeholder only | Ingested from ADRs, git history, docs, incidents |
+
+Brownfield DRAFT terms are never asserted as confirmed — every seeded term carries a `DRAFT` marker and must be promoted via `/grill-with-docs`.
+
+## Knowledge Graph
+
+The `knowledge-graph` skill derives structural relationships directly from the codebase using built-in search — no external packages needed.
+
+It has four modes:
+
+| Mode | When to use |
+|------|-------------|
+| `impact` | Before any rename, signature change, or deletion — shows blast radius |
+| `context` | Before touching an unfamiliar symbol — 360° view of callers, callees, role |
+| `trace` | When debugging — full call chain from an entry point across layers |
+| `cluster-map` | On demand — groups files by import coupling → maps to bounded contexts |
+
+Cluster-map output feeds into `/ingest` (for the knowledge base) and `context-harvest` (for richer DRAFT term seeding).
+
 ## Rule Pack
 
 A rule pack is a bundle of standards imported into the project.
@@ -137,13 +164,14 @@ The `.velocity/` directory is the project's source of truth for context, workflo
 
 ```text
 .velocity/
-├── project-intelligence/
-├── project-context/
-├── context/
-├── guardrails/
-├── knowledge-base/
-├── sdlc/
-└── artifacts/
+├── project-intelligence/   ← stack fingerprint, repo maturity
+├── project-context/         ← engineering, testing, security, API standards
+├── agents/                  ← configured agent instances
+├── skills/                  ← stack-specific skill variants
+├── guardrails/              ← rules and hooks
+├── knowledge-base/          ← ADRs, incidents, runbooks, git digest, graph clusters
+├── sdlc/                    ← pipeline.yaml, pipeline-config.yaml, state/
+└── artifacts/               ← prds, features, tasks, handoffs, impact reports, …
 ```
 
 If you remember only one thing: Velocity works by routing the request first, loading the right context second, and executing inside a controlled phase flow after that.

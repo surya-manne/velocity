@@ -32,6 +32,7 @@ Validation: A DRAFT CONTEXT.md exists per bounded context with the fixed heading
 - Read `.velocity/context-map.md` — resolved CONTEXT.md path per bounded context
 - Read existing CONTEXT.md at each path (if present) — never overwrite confirmed (non-DRAFT) terms
 - Read repo `README.md` and top-level structure — domain summary source
+- Read `.velocity/knowledge-base/graph-clusters.md` if present — structural cluster signals to enrich term seeding (optional; skip silently if absent)
 - Invoked by `/init` for brownfield repos; re-runnable by `/sync` in delta mode
 
 </prerequisites>
@@ -47,6 +48,7 @@ Run per bounded context resolved from `context-map.md`. Reuse the code-scan patt
    - **API route namespaces** — `/api/v1/<noun>/…` path segments; controller/router names.
    - **DB schema** — table and primary entity column names from migrations/schema files.
    - **Event topics** — `*Producer*`/`*Consumer*`/`*Event*` names and broker topic prefixes.
+   - **Graph cluster members** _(if `.velocity/knowledge-base/graph-clusters.md` exists)_: for each cluster that maps to this bounded context (≥70% file overlap), extract class and function names listed as cluster members. These are higher-confidence candidates because they were detected by structural community detection rather than naming heuristics alone — weight them above route/topic signals but below explicit entity names.
    Normalize to a single canonical form, dedupe across signals, and keep only recurring/structural nouns (skip framework/util/infra names). Write each as:
    `**{Term}** _(DRAFT — confirm via grill-with-docs)_: {one-line inferred definition}. _Evidence: {file/path or route}._`
 
